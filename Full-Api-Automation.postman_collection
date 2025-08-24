@@ -1,0 +1,4539 @@
+{
+	"info": {
+		"_postman_id": "e912002a-d036-4077-937d-e7d8aa8a475d",
+		"name": "Testing Conduit [GláuberMalta]",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "43636038",
+		"_collection_link": "https://mate-academy-6240.postman.co/workspace/Postman-practice-%255BGl%25C3%25A1uberMalta%255D~196e83f4-e22b-4ea3-998d-50abbe8f483d/collection/43636038-e912002a-d036-4077-937d-e7d8aa8a475d?action=share&source=collection_link&creator=43636038"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Successful sign in",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"  pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const email = `user${Math.floor(Math.random() * 100000)}@example.com`;\r",
+									"const username = `usuario_${Math.floor(Math.random() * 100000)}`;\r",
+									"const senha = Math.random().toString(36).slice(-8);\r",
+									"\r",
+									"const usuario = {\r",
+									"    user: {\r",
+									"        username: username,\r",
+									"        email: email,\r",
+									"        password: senha\r",
+									"    }\r",
+									"};\r",
+									"\r",
+									"pm.sendRequest({\r",
+									"    url: \"https://conduit.mate.academy/api/users\",\r",
+									"    method: \"POST\",\r",
+									"    header: {\r",
+									"        \"Content-Type\": \"application/json\"\r",
+									"    },\r",
+									"    body: {\r",
+									"        mode: \"raw\",\r",
+									"        raw: JSON.stringify(usuario)\r",
+									"    }\r",
+									"}, function (err, res) {\r",
+									"    if (err) {\r",
+									"        console.log(\"Erro ao criar usuário:\", err);\r",
+									"    } else {\r",
+									"        const resposta = res.json();\r",
+									"        console.log(\"Usuário criado com sucesso:\", resposta);\r",
+									"\r",
+									"        pm.environment.set(\"emailUsuario\", email);\r",
+									"        pm.environment.set(\"senhaUsuario\", senha);\r",
+									"        pm.environment.set(\"usernameUsuario\", username);\r",
+									"    }\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"user\": {\r\n        \"email\": \"{{emailUsuario}}\",\r\n        \"password\": \"{{senhaUsuario}}\"\r\n    }\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/users/login",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"users",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sign in with non-existing credential",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 422\", function () {\r",
+									"  pm.response.to.have.status(422);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response contains error message\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.errors).to.exist;\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const emailInvalido = `naoexiste${Math.floor(Math.random() * 100000)}@example.com`;\r",
+									"const senhaInvalida = \"senhaErrada123\";\r",
+									"\r",
+									"pm.environment.set(\"emailUsuario\", emailInvalido);\r",
+									"pm.environment.set(\"senhaUsuario\", senhaInvalida);\r",
+									"\r",
+									"console.log(\"Tentando login com credenciais inexistentes...\");\r",
+									"console.log(\"Email:\", emailInvalido);\r",
+									"console.log(\"Senha:\", senhaInvalida);\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"user\": {\r\n        \"email\": \"{{emailUsuario}}\",\r\n        \"password\": \"{{senhaUsuario}}\"\r\n    }\r\n}\r\n"
+						},
+						"url": {
+							"raw": "{{url}}/users/login",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"users",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sign in with empty email",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 422\", function () {\r",
+									"  pm.response.to.have.status(422);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response contains email error\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.errors.email).to.exist;\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const emailVazio = \"\";\r",
+									"const senhaAleatoria = Math.random().toString(36).slice(-8);\r",
+									"\r",
+									"pm.environment.set(\"emailUsuario\", emailVazio);\r",
+									"pm.environment.set(\"senhaUsuario\", senhaAleatoria);\r",
+									"\r",
+									"console.log(\"Tentando login com email vazio\");\r",
+									"console.log(\"Email:\", emailVazio);\r",
+									"console.log(\"Senha:\", senhaAleatoria);\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"user\": {\r\n        \"email\": \"{{emailUsuario}}\",\r\n        \"password\": \"{{senhaUsuario}}\"\r\n    }\r\n}\r\n"
+						},
+						"url": {
+							"raw": "{{url}}/users/login",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"users",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sign in with empty password",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 422\", function () {\r",
+									"  pm.response.to.have.status(422);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response contains password error\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.errors.password).to.exist;\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const emailValido = `user${Math.floor(Math.random() * 100000)}@example.com`;\r",
+									"const senhaVazia = \"\";\r",
+									"\r",
+									"pm.environment.set(\"emailUsuario\", emailValido);\r",
+									"pm.environment.set(\"senhaUsuario\", senhaVazia);\r",
+									"\r",
+									"console.log(\"Tentando login com senha vazia\");\r",
+									"console.log(\"Email:\", emailValido);\r",
+									"console.log(\"Senha:\", senhaVazia);\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"user\": {\r\n        \"email\": \"{{emailUsuario}}\",\r\n        \"password\": \"{{senhaUsuario}}\"\r\n    }\r\n}\r\n"
+						},
+						"url": {
+							"raw": "{{url}}/users/login",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"users",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Successful sign up",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"  pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const email = `user${Math.floor(Math.random() * 100000)}@example.com`;\r",
+									"\r",
+									"const username = `usuario_${Math.floor(Math.random() * 100000)}`;\r",
+									"\r",
+									"const senha = Math.random().toString(36).slice(-8);\r",
+									"\r",
+									"pm.environment.set(\"emailUsuario\", email);\r",
+									"pm.environment.set(\"usernameUsuario\", username);\r",
+									"pm.environment.set(\"senhaUsuario\", senha);\r",
+									"\r",
+									"console.log(\"Dados gerados:\");\r",
+									"console.log(\"Email:\", email);\r",
+									"console.log(\"Username:\", username);\r",
+									"console.log(\"Senha:\", senha);\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"user\": {\r\n    \"username\": \"{{usernameUsuario}}\",\r\n    \"email\": \"{{emailUsuario}}\",\r\n    \"password\": \"{{senhaUsuario}}\"\r\n  }\r\n}"
+						},
+						"url": {
+							"raw": "{{url}}/users",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sign up with taken username",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 422\", function () {\r",
+									"  pm.response.to.have.status(422);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response contains username error\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.errors.username).to.exist;\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const email = `user${Math.floor(Math.random() * 100000)}@example.com`;\r",
+									"const username = `usuario_${Math.floor(Math.random() * 100000)}`;\r",
+									"const senha = Math.random().toString(36).slice(-8);\r",
+									"\r",
+									"const usuario = {\r",
+									"    user: {\r",
+									"        username: username,\r",
+									"        email: email,\r",
+									"        password: senha\r",
+									"    }\r",
+									"};\r",
+									"\r",
+									"pm.sendRequest({\r",
+									"    url: \"https://conduit.mate.academy/api/users\",\r",
+									"    method: \"POST\",\r",
+									"    header: {\r",
+									"        \"Content-Type\": \"application/json\"\r",
+									"    },\r",
+									"    body: {\r",
+									"        mode: \"raw\",\r",
+									"        raw: JSON.stringify(usuario)\r",
+									"    }\r",
+									"}, function (err, res) {\r",
+									"    if (err) {\r",
+									"        console.log(\"Erro ao criar usuário:\", err);\r",
+									"    } else {\r",
+									"        console.log(\"Usuário criado com sucesso!\");\r",
+									"\r",
+									"        pm.environment.set(\"emailUsuario\", email);\r",
+									"        pm.environment.set(\"senhaUsuario\", senha);\r",
+									"        pm.environment.set(\"usernameUsuario\", username);\r",
+									"    }\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"user\": {\r\n        \"email\": \"{{$randomEmail}}\",\r\n        \"username\": \"{{usernameUsuario}}\",\r\n        \"password\": \"{{senhaUsuario}}\"\r\n    }\r\n}\r\n\r\n"
+						},
+						"url": {
+							"raw": "{{url}}/users",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sign up with taken email",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 422\", function () {\r",
+									"  pm.response.to.have.status(422);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response contains email error\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.errors.email).to.exist;\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const emailReutilizado = `usuario_${Math.floor(Math.random() * 100000)}@example.com`;\r",
+									"const usernameNovo = `usuario_${Math.floor(Math.random() * 100000)}`;\r",
+									"const senhaAleatoria = Math.random().toString(36).slice(-8);\r",
+									"\r",
+									"pm.environment.set(\"emailReutilizado\", emailReutilizado);\r",
+									"pm.environment.set(\"usernameNovo\", usernameNovo);\r",
+									"pm.environment.set(\"senhaUsuario\", senhaAleatoria);\r",
+									"\r",
+									"const usuario = {\r",
+									"    user: {\r",
+									"        username: pm.environment.get(\"usernameNovo\"),\r",
+									"        email: pm.environment.get(\"emailReutilizado\"),\r",
+									"        password: pm.environment.get(\"senhaUsuario\")\r",
+									"    }\r",
+									"};\r",
+									"\r",
+									"pm.sendRequest({\r",
+									"    url: \"https://conduit.mate.academy/api/users\",\r",
+									"    method: \"POST\",\r",
+									"    header: { \"Content-Type\": \"application/json\" },\r",
+									"    body: { mode: \"raw\", raw: JSON.stringify(usuario) }\r",
+									"}, function (err, res) {\r",
+									"    if (!err && res.status === 201) {\r",
+									"        console.log(\"Usuário criado com sucesso!\");\r",
+									"    } else {\r",
+									"        console.error(\"Erro ao criar usuário:\", res.json());\r",
+									"    }\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"user\": {\r\n        \"username\": \"{{usernameNovo}}\",\r\n        \"email\": \"{{emailReutilizado}}\",\r\n        \"password\": \"{{senhaUsuario}}\"\r\n    }\r\n}\r\n"
+						},
+						"url": {
+							"raw": "{{url}}/users",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sign up with username starting from number",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 422\", function () {\r",
+									"  pm.response.to.have.status(422);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response contains username error\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.errors.username).to.exist;\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const usernameComNumero = `${Math.floor(Math.random() * 10)}usuario_${Math.floor(Math.random() * 100000)}`;\r",
+									"const emailNovo = `user${Math.floor(Math.random() * 100000)}@example.com`;\r",
+									"const senhaAleatoria = Math.random().toString(36).slice(-8);\r",
+									"\r",
+									"pm.environment.set(\"usernameUsuario\", usernameComNumero);\r",
+									"pm.environment.set(\"emailUsuario\", emailNovo);\r",
+									"pm.environment.set(\"senhaUsuario\", senhaAleatoria);\r",
+									"\r",
+									"console.log(\"Tentando criar um usuário com username iniciando com número\");\r",
+									"console.log(\"Username:\", usernameComNumero);\r",
+									"console.log(\"Email:\", emailNovo);\r",
+									"console.log(\"Senha:\", senhaAleatoria);\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"user\": {\r\n        \"username\": \"{{usernameUsuario}}\",\r\n        \"email\": \"{{emailUsuario}}\",\r\n        \"password\": \"{{senhaUsuario}}\"\r\n    }\r\n}\r\n"
+						},
+						"url": {
+							"raw": "{{url}}/users",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sign up with username with 41 symbols",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 422\", function () {\r",
+									"  pm.response.to.have.status(422);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response contains username length error\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.errors.username).to.exist;\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"function gerarUsernameLongo() {\r",
+									"    let parte1 = `usuário_${Math.random().toString(36).substring(2, 18)}`;\r",
+									"    let parte2 = Math.random().toString(36).substring(2, 23);\r",
+									"    let usernameFinal = `${parte1}_${parte2}`;\r",
+									"\r",
+									"    while (usernameFinal.length < 41) {\r",
+									"        usernameFinal += Math.random().toString(36).charAt(2);\r",
+									"    }\r",
+									"\r",
+									"    return usernameFinal.substring(0, 41);\r",
+									"}\r",
+									"\r",
+									"function gerarEmailUnico() {\r",
+									"    return `cliente_${Date.now()}_${Math.floor(Math.random() * 10000)}@exemplo.com`;\r",
+									"}\r",
+									"\r",
+									"function gerarSenhaSegura() {\r",
+									"    return `${Math.random().toString(36).slice(-8)}X!7`;\r",
+									"}\r",
+									"\r",
+									"const nomeUsuario = gerarUsernameLongo();\r",
+									"const emailCliente = gerarEmailUnico();\r",
+									"const senhaCliente = gerarSenhaSegura();\r",
+									"\r",
+									"const usuario = {\r",
+									"    user: {\r",
+									"        username: nomeUsuario,\r",
+									"        email: emailCliente,\r",
+									"        password: senhaCliente\r",
+									"    }\r",
+									"};\r",
+									"\r",
+									"pm.environment.set(\"nomeUsuario\", nomeUsuario);\r",
+									"pm.environment.set(\"emailCliente\", emailCliente);\r",
+									"pm.environment.set(\"senhaCliente\", senhaCliente);\r",
+									"\r",
+									"console.log(\"Criando usuário com dados únicos:\");\r",
+									"console.log(\"Username:\", nomeUsuario);\r",
+									"console.log(\"Email:\", emailCliente);\r",
+									"console.log(\"Senha:\", senhaCliente);\r",
+									"\r",
+									"pm.sendRequest({\r",
+									"    url: \"https://conduit.mate.academy/api/users\",\r",
+									"    method: \"POST\",\r",
+									"    header: { \"Content-Type\": \"application/json\" },\r",
+									"    body: { mode: \"raw\", raw: JSON.stringify(usuario) }\r",
+									"}, function (err, res) {\r",
+									"    if (!err && res.status === 201) {\r",
+									"        console.log(\"Usuário criado com sucesso!\");\r",
+									"    } else {\r",
+									"        console.error(\"Erro ao criar usuário:\", res.json());\r",
+									"    }\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"user\": {\r\n    \"username\": \"{{nomeUsuario}}\",\r\n    \"email\": \"{{emailCliente}}\",\r\n    \"password\": \"{{senhaCliente}}\"\r\n  }\r\n}\r\n\r\n\r\n"
+						},
+						"url": {
+							"raw": "{{url}}/users",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sign up with username with spaces",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 422\", function () {\r",
+									"  pm.response.to.have.status(422);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response contains username error\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.errors.username).to.exist;\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const usernameComEspacos = `usuario teste ${Math.floor(Math.random() * 1000)}`;\r",
+									"const emailNovo = `user${Math.floor(Math.random() * 100000)}@example.com`;\r",
+									"const senhaAleatoria = Math.random().toString(36).slice(-8);\r",
+									"\r",
+									"pm.environment.set(\"usernameUsuario\", usernameComEspacos);\r",
+									"pm.environment.set(\"emailUsuario\", emailNovo);\r",
+									"pm.environment.set(\"senhaUsuario\", senhaAleatoria);\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"user\": {\r\n        \"username\": \"{{usernameUsuario}}\",\r\n        \"email\": \"{{emailUsuario}}\",\r\n        \"password\": \"{{senhaUsuario}}\"\r\n    }\r\n}\r\n\r\n"
+						},
+						"url": {
+							"raw": "{{url}}/users",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sign up with empty username",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 422\", function () {\r",
+									"  pm.response.to.have.status(422);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response contains username error\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.errors.username).to.exist;\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const usernameVazio = \"\";\r",
+									"const emailNovo = `user${Math.floor(Math.random() * 100000)}@example.com`;\r",
+									"const senhaAleatoria = Math.random().toString(36).slice(-8);\r",
+									"\r",
+									"pm.environment.set(\"usernameUsuario\", usernameVazio);\r",
+									"pm.environment.set(\"emailUsuario\", emailNovo);\r",
+									"pm.environment.set(\"senhaUsuario\", senhaAleatoria);\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"user\": {\r\n        \"username\": \"{{usernameUsuario}}\",\r\n        \"email\": \"{{emailUsuario}}\",\r\n        \"password\": \"{{senhaUsuario}}\"\r\n    }\r\n}\r\n"
+						},
+						"url": {
+							"raw": "{{url}}/users",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sign up with empty email",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 422\", function () {\r",
+									"  pm.response.to.have.status(422);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response contains email error\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.errors.email).to.exist;\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const emailVazio = \"\";\r",
+									"const usernameNovo = `usuario_${Math.floor(Math.random() * 100000)}`;\r",
+									"const senhaAleatoria = Math.random().toString(36).slice(-8);\r",
+									"\r",
+									"pm.environment.set(\"emailUsuario\", emailVazio);\r",
+									"pm.environment.set(\"usernameUsuario\", usernameNovo);\r",
+									"pm.environment.set(\"senhaUsuario\", senhaAleatoria);\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"user\": {\r\n        \"username\": \"{{usernameUsuario}}\",\r\n        \"email\": \"{{emailUsuario}}\",\r\n        \"password\": \"{{senhaUsuario}}\"\r\n    }\r\n}\r\n\r\n\r\n"
+						},
+						"url": {
+							"raw": "{{url}}/users",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sign up with email without @",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 422\", function () {\r",
+									"  pm.response.to.have.status(422);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response contains email error\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.errors.email).to.exist;\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const emailSemArroba = `user${Math.floor(Math.random() * 100000)}example.com`;\r",
+									"const usernameNovo = `usuario_${Math.floor(Math.random() * 100000)}`;\r",
+									"const senhaAleatoria = Math.random().toString(36).slice(-8);\r",
+									"\r",
+									"pm.environment.set(\"emailUsuario\", emailSemArroba);\r",
+									"pm.environment.set(\"usernameUsuario\", usernameNovo);\r",
+									"pm.environment.set(\"senhaUsuario\", senhaAleatoria);\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"user\": {\r\n        \"username\": \"{{usernameUsuario}}\",\r\n        \"email\": \"{{emailUsuario}}\",\r\n        \"password\": \"{{senhaUsuario}}\"\r\n    }\r\n}\r\n\r\n\r\n"
+						},
+						"url": {
+							"raw": "{{url}}/users",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sign up with email without .",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 422\", function () {\r",
+									"  pm.response.to.have.status(422);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response contains email error\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.errors.email).to.exist;\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const emailSemPonto = `user${Math.floor(Math.random() * 100000)}@examplecom`;\r",
+									"const usernameNovo = `usuario_${Math.floor(Math.random() * 100000)}`;\r",
+									"const senhaAleatoria = Math.random().toString(36).slice(-8);\r",
+									"\r",
+									"pm.environment.set(\"emailUsuario\", emailSemPonto);\r",
+									"pm.environment.set(\"usernameUsuario\", usernameNovo);\r",
+									"pm.environment.set(\"senhaUsuario\", senhaAleatoria);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"user\": {\r\n        \"username\": \"{{usernameUsuario}}\",\r\n        \"email\": \"{{emailUsuario}}\",\r\n        \"password\": \"{{senhaUsuario}}\"\r\n    }\r\n}\r\n\r\n"
+						},
+						"url": {
+							"raw": "{{url}}/users",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sign up with email without name part",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 422\", function () {\r",
+									"  pm.response.to.have.status(422);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response contains email error\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.errors.email).to.exist;\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const emailSemName = `@example.com`;\r",
+									"const usernameNovo = `usuario_${Math.floor(Math.random() * 100000)}`;\r",
+									"const senhaAleatoria = Math.random().toString(36).slice(-8);\r",
+									"\r",
+									"pm.environment.set(\"emailUsuario\", emailSemName);\r",
+									"pm.environment.set(\"usernameUsuario\", usernameNovo);\r",
+									"pm.environment.set(\"senhaUsuario\", senhaAleatoria);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"user\": {\r\n        \"username\": \"{{usernameUsuario}}\",\r\n        \"email\": \"{{emailUsuario}}\",\r\n        \"password\": \"{{senhaUsuario}}\"\r\n    }\r\n}\r\n"
+						},
+						"url": {
+							"raw": "{{url}}/users",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sign up with email with more than 254 symbols",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Error message is displayed for invalid email\", function () {\r",
+									"    pm.response.to.have.status(422);\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.errors.email).to.include(\"This email does not seem valid.\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const emailLongo = `user${\"a\".repeat(240)}@example.com`;\r",
+									"const usernameNovo = `usuario_${Math.floor(Math.random() * 100000)}`;\r",
+									"const senhaAleatoria = Math.random().toString(36).slice(-8);\r",
+									"\r",
+									"pm.environment.set(\"emailUsuario\", emailLongo);\r",
+									"pm.environment.set(\"usernameUsuario\", usernameNovo);\r",
+									"pm.environment.set(\"senhaUsuario\", senhaAleatoria);\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"user\": {\r\n        \"username\": \"{{usernameUsuario}}\",\r\n        \"email\": \"{{emailUsuario}}\",\r\n        \"password\": \"{{senhaUsuario}}\"\r\n    }\r\n}\r\n\r\n"
+						},
+						"url": {
+							"raw": "{{url}}/users",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sign up with empty password",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 422\", function () {\r",
+									"  pm.response.to.have.status(422);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Return error for empty password\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.errors.password).to.include(\"can't be blank\");\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const senhaVazia = \"\";\r",
+									"const usernameNovo = `usuario_${Math.floor(Math.random() * 100000)}`;\r",
+									"const emailNovo = `user${Math.floor(Math.random() * 100000)}@example.com`;\r",
+									"\r",
+									"pm.environment.set(\"senhaUsuario\", senhaVazia);\r",
+									"pm.environment.set(\"usernameUsuario\", usernameNovo);\r",
+									"pm.environment.set(\"emailUsuario\", emailNovo);\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"user\": {\r\n        \"username\": \"{{usernameUsuario}}\",\r\n        \"email\": \"{{emailUsuario}}\",\r\n        \"password\": \"{{senhaUsuario}}\"\r\n    }\r\n}\r\n"
+						},
+						"url": {
+							"raw": "{{url}}/users",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get info about user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"  pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response has user info\", function () {\r",
+									"    const jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.user).to.have.property(\"email\");\r",
+									"    pm.expect(jsonData.user).to.have.property(\"username\");\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const emailUsuario = `user${Math.floor(Math.random() * 100000)}@example.com`;\r",
+									"const usernameUsuario = `usuario_${Math.floor(Math.random() * 100000)}`;\r",
+									"const senhaUsuario = Math.random().toString(36).slice(-8);\r",
+									"\r",
+									"const usuario = {\r",
+									"    user: {\r",
+									"        username: usernameUsuario,\r",
+									"        email: emailUsuario,\r",
+									"        password: senhaUsuario\r",
+									"    }\r",
+									"};\r",
+									"\r",
+									"pm.sendRequest({\r",
+									"    url: \"https://conduit.mate.academy/api/users\",\r",
+									"    method: \"POST\",\r",
+									"    header: { \"Content-Type\": \"application/json\" },\r",
+									"    body: { mode: \"raw\", raw: JSON.stringify(usuario) }\r",
+									"}, function (err, res) {\r",
+									"    if (err) {\r",
+									"        console.log(\"Erro ao criar usuário:\", err);\r",
+									"    } else {\r",
+									"        const resposta = res.json();\r",
+									"        console.log(\"Usuário criado:\", resposta);\r",
+									"\r",
+									"        pm.environment.set(\"emailUsuario\", emailUsuario);\r",
+									"        pm.environment.set(\"senhaUsuario\", senhaUsuario);\r",
+									"        pm.environment.set(\"usernameUsuario\", usernameUsuario);\r",
+									"        pm.environment.set(\"idUsuario\", resposta.user.id);\r",
+									"        pm.environment.set(\"authToken\", resposta.user.token);\r",
+									"\r",
+									"        console.log(\"Token de autenticação armazenado:\", resposta.user.token);\r",
+									"    }\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/user",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update info about user: image",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Imagem do usuário atualizada corretamente\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"    \r",
+									"    const resposta = pm.response.json();\r",
+									"    pm.expect(resposta.user.image).to.eql(\"https://p2.trrsf.com/image/fget/cf/1200/630/middle/images.terra.com/2023/06/15/programadora-us3i6jqikoxk.jpg\");\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const emailUsuario = `user${Math.floor(Math.random() * 100000)}@example.com`;\r",
+									"const usernameUsuario = `usuario_${Math.floor(Math.random() * 100000)}`;\r",
+									"const senhaUsuario = Math.random().toString(36).slice(-8);\r",
+									"\r",
+									"const usuario = {\r",
+									"    user: {\r",
+									"        username: usernameUsuario,\r",
+									"        email: emailUsuario,\r",
+									"        password: senhaUsuario\r",
+									"    }\r",
+									"};\r",
+									"\r",
+									"pm.sendRequest({\r",
+									"    url: \"https://conduit.mate.academy/api/users\",\r",
+									"    method: \"POST\",\r",
+									"    header: { \"Content-Type\": \"application/json\" },\r",
+									"    body: { mode: \"raw\", raw: JSON.stringify(usuario) }\r",
+									"}, function (err, res) {\r",
+									"    if (err) {\r",
+									"        console.log(\"Erro ao criar usuário:\", err);\r",
+									"    } else {\r",
+									"        const resposta = res.json();\r",
+									"        console.log(\"Usuário criado:\", resposta);\r",
+									"\r",
+									"        pm.environment.set(\"emailUsuario\", emailUsuario);\r",
+									"        pm.environment.set(\"senhaUsuario\", senhaUsuario);\r",
+									"        pm.environment.set(\"usernameUsuario\", usernameUsuario);\r",
+									"        pm.environment.set(\"idUsuario\", resposta.user.id);\r",
+									"        pm.environment.set(\"authToken\", resposta.user.token);\r",
+									"    }\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{authToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"user\": {\r\n        \"username\": \"{{usernameUsuario}}\",\r\n        \"email\": \"{{emailUsuario}}\",\r\n        \"password\": \"{{senhaUsuario}}\",\r\n        \"image\": \"https://p2.trrsf.com/image/fget/cf/1200/630/middle/images.terra.com/2023/06/15/programadora-us3i6jqikoxk.jpg\"\r\n    }\r\n}\r\n\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/user",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update info about user: bio",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const biosAleatorias = [\r",
+									"    \"Apaixonado por desafios!\",\r",
+									"    \"Amante tecnologia.\",\r",
+									"    \"Desenvolvedor.\",\r",
+									"    \"QA.\",\r",
+									"    \"FOCO, FORÇA E FÉ.\"\r",
+									"];\r",
+									"\r",
+									"const novaBio = biosAleatorias[Math.floor(Math.random() * biosAleatorias.length)];\r",
+									"\r",
+									"pm.environment.set(\"novaBio\", novaBio);\r",
+									"console.log(\"Nova bio definida:\", novaBio);\r",
+									"\r",
+									"const dadosAtualizados = {\r",
+									"    user: {\r",
+									"        bio: novaBio\r",
+									"    }\r",
+									"};\r",
+									"\r",
+									"pm.sendRequest({\r",
+									"    url: \"https://conduit.mate.academy/api/user\",\r",
+									"    method: \"PUT\",\r",
+									"    header: { \r",
+									"        \"Content-Type\": \"application/json\",\r",
+									"        \"Authorization\": `Token ${pm.environment.get(\"authToken\")}`\r",
+									"    },\r",
+									"    body: { mode: \"raw\", raw: JSON.stringify(dadosAtualizados) }\r",
+									"}, function (err, res) {\r",
+									"    if (err) {\r",
+									"        console.log(\"Erro ao atualizar bio:\", err);\r",
+									"    } else {\r",
+									"        console.log(\"Bio atualizada:\", res.json());\r",
+									"    }\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const emailUsuario = `user${Math.floor(Math.random() * 100000)}@example.com`;\r",
+									"const usernameUsuario = `usuario_${Math.floor(Math.random() * 100000)}`;\r",
+									"const senhaUsuario = Math.random().toString(36).slice(-8);\r",
+									"\r",
+									"const usuario = {\r",
+									"    user: {\r",
+									"        username: usernameUsuario,\r",
+									"        email: emailUsuario,\r",
+									"        password: senhaUsuario\r",
+									"    }\r",
+									"};\r",
+									"\r",
+									"pm.sendRequest({\r",
+									"    url: \"https://conduit.mate.academy/api/users\",\r",
+									"    method: \"POST\",\r",
+									"    header: { \"Content-Type\": \"application/json\" },\r",
+									"    body: { mode: \"raw\", raw: JSON.stringify(usuario) }\r",
+									"}, function (err, res) {\r",
+									"    if (err) {\r",
+									"        console.log(\"Erro ao criar usuário:\", err);\r",
+									"    } else {\r",
+									"        const resposta = res.json();\r",
+									"        console.log(\"Usuário criado:\", resposta);\r",
+									"\r",
+									"        pm.environment.set(\"emailUsuario\", emailUsuario);\r",
+									"        pm.environment.set(\"senhaUsuario\", senhaUsuario);\r",
+									"        pm.environment.set(\"usernameUsuario\", usernameUsuario);\r",
+									"        pm.environment.set(\"idUsuario\", resposta.user.id);\r",
+									"        pm.environment.set(\"authToken\", resposta.user.token);\r",
+									"    }\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{authToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"user\": {\r\n        \"username\": \"{{usernameUsuario}}\",\r\n        \"email\": \"{{emailUsuario}}\",\r\n        \"password\": \"{{senhaUsuario}}\",\r\n        \"bio\": \"{{novaBio}}\"\r\n    }\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/user",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update info about user: username",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const novoUsername = `usuario_${Math.floor(Math.random() * 100000)}`;\r",
+									"pm.environment.set(\"novoUsername\", novoUsername);\r",
+									"\r",
+									"const dadosAtualizados = {\r",
+									"    user: {\r",
+									"        username: novoUsername\r",
+									"    }\r",
+									"};\r",
+									"\r",
+									"pm.sendRequest({\r",
+									"    url: \"https://conduit.mate.academy/api/user\",\r",
+									"    method: \"PUT\",\r",
+									"    header: {\r",
+									"        \"Content-Type\": \"application/json\",\r",
+									"        \"Authorization\": `Token ${pm.environment.get(\"authToken\")}`\r",
+									"    },\r",
+									"    body: { mode: \"raw\", raw: JSON.stringify(dadosAtualizados) }\r",
+									"}, function (err, res) {\r",
+									"    if (err) {\r",
+									"        console.log(\"Erro ao atualizar username:\", err);\r",
+									"    } else {\r",
+									"        console.log(\"Username atualizado:\", res.json());\r",
+									"    }\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Username atualizado com sucesso\", function () {\r",
+									"    const jsonData = pm.response.json();\r",
+									"    const esperado = pm.environment.get(\"novoUsername\");\r",
+									"    console.log(\"Esperado:\", esperado);\r",
+									"    console.log(\"Recebido:\", jsonData.user.username);\r",
+									"    pm.expect(jsonData.user.username);\r",
+									"});\r",
+									"\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const emailUsuario = `user${Math.floor(Math.random() * 100000)}@example.com`;\r",
+									"const usernameUsuario = `usuario_${Math.floor(Math.random() * 100000)}`;\r",
+									"const senhaUsuario = Math.random().toString(36).slice(-8);\r",
+									"\r",
+									"const novoUsername = usernameUsuario + \"_atualizado\";\r",
+									"\r",
+									"const usuario = {\r",
+									"    user: {\r",
+									"        username: usernameUsuario,\r",
+									"        email: emailUsuario,\r",
+									"        password: senhaUsuario\r",
+									"    }\r",
+									"};\r",
+									"\r",
+									"pm.sendRequest({\r",
+									"    url: \"https://conduit.mate.academy/api/users\",\r",
+									"    method: \"POST\",\r",
+									"    header: { \"Content-Type\": \"application/json\" },\r",
+									"    body: { mode: \"raw\", raw: JSON.stringify(usuario) }\r",
+									"}, function (err, res) {\r",
+									"    if (err) {\r",
+									"        console.log(\"Erro ao criar usuário:\", err);\r",
+									"    } else {\r",
+									"        const resposta = res.json();\r",
+									"        console.log(\"Usuário criado:\", resposta);\r",
+									"\r",
+									"        pm.environment.set(\"emailUsuario\", emailUsuario);\r",
+									"        pm.environment.set(\"senhaUsuario\", senhaUsuario);\r",
+									"        pm.environment.set(\"usernameUsuario\", usernameUsuario);\r",
+									"        pm.environment.set(\"novoUsername\", novoUsername);\r",
+									"        pm.environment.set(\"authToken\", resposta.user.token);\r",
+									"    }\r",
+									"});\r",
+									"\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{authToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"user\": {\r\n    \"username\": \"{{novoUsername}}\"\r\n  }\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/user",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update info about user: email",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"  pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Email atualizado com sucesso\", function () {\r",
+									"    const jsonData = pm.response.json();\r",
+									"    const esperado = pm.environment.get(\"novoEmail\");\r",
+									"    console.log(\"Esperado:\", esperado);\r",
+									"    console.log(\"Recebido:\", jsonData.user.email);\r",
+									"    pm.expect(jsonData.user.email).to.eql(esperado);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const emailUsuario = `user${Math.floor(Math.random() * 100000)}@example.com`;\r",
+									"const novoEmail = `novo_${emailUsuario}`;\r",
+									"\r",
+									"const usernameUsuario = `usuario_${Math.floor(Math.random() * 100000)}`;\r",
+									"const senhaUsuario = Math.random().toString(36).slice(-8);\r",
+									"\r",
+									"const usuario = {\r",
+									"    user: {\r",
+									"        username: usernameUsuario,\r",
+									"        email: emailUsuario,\r",
+									"        password: senhaUsuario\r",
+									"    }\r",
+									"};\r",
+									"\r",
+									"pm.sendRequest({\r",
+									"    url: \"https://conduit.mate.academy/api/users\",\r",
+									"    method: \"POST\",\r",
+									"    header: { \"Content-Type\": \"application/json\" },\r",
+									"    body: { mode: \"raw\", raw: JSON.stringify(usuario) }\r",
+									"}, function (err, res) {\r",
+									"    if (err) {\r",
+									"        console.log(\"Erro ao criar usuário:\", err);\r",
+									"    } else {\r",
+									"        const resposta = res.json();\r",
+									"        console.log(\"Usuário criado:\", resposta);\r",
+									"\r",
+									"        pm.environment.set(\"emailUsuario\", emailUsuario);\r",
+									"        pm.environment.set(\"novoEmail\", novoEmail);\r",
+									"        pm.environment.set(\"senhaUsuario\", senhaUsuario);\r",
+									"        pm.environment.set(\"usernameUsuario\", usernameUsuario);\r",
+									"        pm.environment.set(\"idUsuario\", resposta.user.id);\r",
+									"        pm.environment.set(\"authToken\", resposta.user.token);\r",
+									"    }\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{authToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"user\": {\r\n    \"email\": \"{{novoEmail}}\"\r\n  }\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/user",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update info about user: password",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Senha atualizada com sucesso (status 200)\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const emailUsuario = `user${Math.floor(Math.random() * 100000)}@example.com`;\r",
+									"const usernameUsuario = `usuario_${Math.floor(Math.random() * 100000)}`;\r",
+									"const senhaUsuario = Math.random().toString(36).slice(-8);\r",
+									"const novaSenha = Math.random().toString(36).slice(-8);\r",
+									"\r",
+									"const usuario = {\r",
+									"    user: {\r",
+									"        username: usernameUsuario,\r",
+									"        email: emailUsuario,\r",
+									"        password: senhaUsuario\r",
+									"    }\r",
+									"};\r",
+									"\r",
+									"pm.sendRequest({\r",
+									"    url: \"https://conduit.mate.academy/api/users\",\r",
+									"    method: \"POST\",\r",
+									"    header: { \"Content-Type\": \"application/json\" },\r",
+									"    body: { mode: \"raw\", raw: JSON.stringify(usuario) }\r",
+									"}, function (err, res) {\r",
+									"    if (err) {\r",
+									"        console.log(\"Erro ao criar usuário:\", err);\r",
+									"    } else {\r",
+									"        const resposta = res.json();\r",
+									"        console.log(\"Usuário criado:\", resposta);\r",
+									"\r",
+									"        pm.environment.set(\"emailUsuario\", emailUsuario);\r",
+									"        pm.environment.set(\"senhaUsuario\", senhaUsuario);\r",
+									"        pm.environment.set(\"novaSenha\", novaSenha);\r",
+									"        pm.environment.set(\"usernameUsuario\", usernameUsuario);\r",
+									"        pm.environment.set(\"idUsuario\", resposta.user.id);\r",
+									"        pm.environment.set(\"authToken\", resposta.user.token);\r",
+									"    }\r",
+									"});\r",
+									"\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{authToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"user\": {\r\n    \"password\": \"{{novaSenha}}\"\r\n  }\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/user",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update info about user without authorization",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 401\", function () {\r",
+									"  pm.response.to.have.status(401);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const emailUsuario = `user${Math.floor(Math.random() * 100000)}@example.com`;\r",
+									"const usernameUsuario = `usuario_${Math.floor(Math.random() * 100000)}`;\r",
+									"const senhaUsuario = Math.random().toString(36).slice(-8);\r",
+									"\r",
+									"const usuario = {\r",
+									"    user: {\r",
+									"        username: usernameUsuario,\r",
+									"        email: emailUsuario,\r",
+									"        password: senhaUsuario\r",
+									"    }\r",
+									"};\r",
+									"\r",
+									"pm.sendRequest({\r",
+									"    url: \"https://conduit.mate.academy/api/users\",\r",
+									"    method: \"POST\",\r",
+									"    header: { \"Content-Type\": \"application/json\" },\r",
+									"    body: { mode: \"raw\", raw: JSON.stringify(usuario) }\r",
+									"}, function (err, res) {\r",
+									"    if (err) {\r",
+									"        console.log(\"Erro ao criar usuário:\", err);\r",
+									"    } else {\r",
+									"        const resposta = res.json();\r",
+									"        console.log(\"Usuário criado:\", resposta);\r",
+									"\r",
+									"        pm.environment.set(\"emailUsuario\", emailUsuario);\r",
+									"        pm.environment.set(\"senhaUsuario\", senhaUsuario);\r",
+									"        pm.environment.set(\"usernameUsuario\", usernameUsuario);\r",
+									"        pm.environment.set(\"idUsuario\", resposta.user.id);\r",
+									"    }\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/user",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"user"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Article",
+			"item": [
+				{
+					"name": "Create an article",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"  pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const emailUsuario = `user${Math.floor(Math.random() * 100000)}@example.com`;\r",
+									"const usernameUsuario = `usuario_${Math.floor(Math.random() * 100000)}`;\r",
+									"const senhaUsuario = Math.random().toString(36).slice(-8);\r",
+									"const usuario = {\r",
+									"    user: {\r",
+									"        username: usernameUsuario,\r",
+									"        email: emailUsuario,\r",
+									"        password: senhaUsuario\r",
+									"    }\r",
+									"};\r",
+									"// Criar usuário\r",
+									"pm.sendRequest({\r",
+									"    url: \"https://conduit.mate.academy/api/users\",\r",
+									"    method: \"POST\",\r",
+									"    header: { \"Content-Type\": \"application/json\" },\r",
+									"    body: { mode: \"raw\", raw: JSON.stringify(usuario) }\r",
+									"}, function (err, res) {\r",
+									"    if (err) {\r",
+									"        console.log(\"Erro ao criar usuário:\", err);\r",
+									"    } else {\r",
+									"        const resposta = res.json();\r",
+									"        console.log(\"Usuário criado:\", resposta);\r",
+									"        pm.environment.set(\"emailUsuario\", emailUsuario);\r",
+									"        pm.environment.set(\"senhaUsuario\", senhaUsuario);\r",
+									"        pm.environment.set(\"usernameUsuario\", usernameUsuario);\r",
+									"        pm.environment.set(\"idUsuario\", resposta.user.id);\r",
+									"        pm.environment.set(\"authToken\", resposta.user.token);\r",
+									"    \r",
+									"        // Criar artigo para o usuário recém-criado\r",
+									"        const tituloArtigo = \"Meu Primeiro Artigo\";\r",
+									"        const corpoArtigo = \"Este é o conteúdo do artigo criado automaticamente.\";\r",
+									"        pm.environment.set(\"tituloArtigo\", tituloArtigo);\r",
+									"        pm.environment.set(\"corpoArtigo\", corpoArtigo);\r",
+									"    }\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{authToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"article\": {\r\n        \"title\": \"{{tituloArtigo}}\",\r\n         \"description\": \"Description\",\r\n        \"body\": \"{{corpoArtigo}}\",\r\n        \"author\": \"{{usernameUsuario}}\",\r\n        \"tagList\": [\"postman\", \"automation\"]\r\n    }\r\n}\r\n\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/articles",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"articles"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update an article",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"  pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Article updated successfully\", function () {\r",
+									"    const jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.article.title).to.eql(\"Novo título atualizado\");\r",
+									"    pm.expect(jsonData.article.description).to.eql(\"Descrição editada via automação\");\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const emailUsuario = `user${Math.floor(Math.random() * 100000)}@example.com`;\r",
+									"const usernameUsuario = `usuario_${Math.floor(Math.random() * 100000)}`;\r",
+									"const senhaUsuario = Math.random().toString(36).slice(-8);\r",
+									"\r",
+									"const usuario = {\r",
+									"    user: {\r",
+									"        username: usernameUsuario,\r",
+									"        email: emailUsuario,\r",
+									"        password: senhaUsuario\r",
+									"    }\r",
+									"};\r",
+									"\r",
+									"pm.sendRequest({\r",
+									"    url: \"https://conduit.mate.academy/api/users\",\r",
+									"    method: \"POST\",\r",
+									"    header: { \"Content-Type\": \"application/json\" },\r",
+									"    body: { mode: \"raw\", raw: JSON.stringify(usuario) }\r",
+									"}, function (err, res) {\r",
+									"    if (err) {\r",
+									"        console.log(\"Erro ao criar usuário:\", err);\r",
+									"    } else {\r",
+									"        const resposta = res.json();\r",
+									"        console.log(\"Usuário criado:\", resposta);\r",
+									"\r",
+									"        pm.environment.set(\"emailUsuario\", emailUsuario);\r",
+									"        pm.environment.set(\"senhaUsuario\", senhaUsuario);\r",
+									"        pm.environment.set(\"usernameUsuario\", usernameUsuario);\r",
+									"        pm.environment.set(\"authToken\", resposta.user.token);\r",
+									"\r",
+									"        const artigo = {\r",
+									"            article: {\r",
+									"                title: \"Meu Primeiro Artigo\",\r",
+									"                description: \"Descrição inicial do artigo\",\r",
+									"                body: \"Este é o conteúdo do artigo criado automaticamente.\",\r",
+									"                tagList: [\"QA\", \"Testes\"]\r",
+									"            }\r",
+									"        };\r",
+									"\r",
+									"        pm.sendRequest({\r",
+									"            url: \"https://conduit.mate.academy/api/articles\",\r",
+									"            method: \"POST\",\r",
+									"            header: {\r",
+									"                \"Content-Type\": \"application/json\",\r",
+									"                \"Authorization\": `Token ${resposta.user.token}`\r",
+									"            },\r",
+									"            body: { mode: \"raw\", raw: JSON.stringify(artigo) }\r",
+									"        }, function (err, res) {\r",
+									"            if (err) {\r",
+									"                console.log(\"Erro ao criar artigo:\", err);\r",
+									"            } else {\r",
+									"                const respostaArtigo = res.json();\r",
+									"                console.log(\"Artigo criado:\", respostaArtigo);\r",
+									"                pm.environment.set(\"slugArtigo\", respostaArtigo.article.slug);\r",
+									"            }\r",
+									"        });\r",
+									"    }\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{authToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"article\": {\r\n        \"title\": \"Novo título atualizado\",\r\n        \"description\": \"Descrição editada via automação\",\r\n        \"body\": \"Conteúdo modificado!\"\r\n    }\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/articles/{{slugArtigo}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"articles",
+								"{{slugArtigo}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete an article",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 204\", function () {\r",
+									"  pm.response.to.have.status(204);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"\r",
+									"// Gerar informações do usuário aleatório\r",
+									"const emailUsuario = `user${Math.floor(Math.random() * 100000)}@example.com`;\r",
+									"const usernameUsuario = `usuario_${Math.floor(Math.random() * 100000)}`;\r",
+									"const senhaUsuario = Math.random().toString(36).slice(-8);\r",
+									"\r",
+									"const usuario = {\r",
+									"    user: {\r",
+									"        username: usernameUsuario,\r",
+									"        email: emailUsuario,\r",
+									"        password: senhaUsuario\r",
+									"    }\r",
+									"};\r",
+									"\r",
+									"// Criar usuário\r",
+									"pm.sendRequest({\r",
+									"    url: \"https://conduit.mate.academy/api/users\",\r",
+									"    method: \"POST\",\r",
+									"    header: { \"Content-Type\": \"application/json\" },\r",
+									"    body: { mode: \"raw\", raw: JSON.stringify(usuario) }\r",
+									"}, function (err, res) {\r",
+									"    if (err) {\r",
+									"        console.log(\"Erro ao criar usuário:\", err);\r",
+									"    } else {\r",
+									"        const resposta = res.json();\r",
+									"        console.log(\"Usuário criado:\", resposta);\r",
+									"\r",
+									"        pm.environment.set(\"emailUsuario\", emailUsuario);\r",
+									"        pm.environment.set(\"senhaUsuario\", senhaUsuario);\r",
+									"        pm.environment.set(\"usernameUsuario\", usernameUsuario);\r",
+									"        pm.environment.set(\"authToken\", resposta.user.token);\r",
+									"\r",
+									"        // Criar artigo para o usuário recém-criado\r",
+									"        const artigo = {\r",
+									"            article: {\r",
+									"                title: \"Artigo para Deletar\",\r",
+									"                description: \"Este artigo será excluído nos testes\",\r",
+									"                body: \"Conteúdo temporário para testar a exclusão.\",\r",
+									"                tagList: [\"QA\", \"Testes\"]\r",
+									"            }\r",
+									"        };\r",
+									"\r",
+									"        pm.sendRequest({\r",
+									"            url: \"https://conduit.mate.academy/api/articles\",\r",
+									"            method: \"POST\",\r",
+									"            header: {\r",
+									"                \"Content-Type\": \"application/json\",\r",
+									"                \"Authorization\": `Token ${resposta.user.token}`\r",
+									"            },\r",
+									"            body: { mode: \"raw\", raw: JSON.stringify(artigo) }\r",
+									"        }, function (err, res) {\r",
+									"            if (err) {\r",
+									"                console.log(\"Erro ao criar artigo:\", err);\r",
+									"            } else {\r",
+									"                const respostaArtigo = res.json();\r",
+									"                console.log(\"Artigo criado:\", respostaArtigo);\r",
+									"                pm.environment.set(\"slugArtigo\", respostaArtigo.article.slug);\r",
+									"            }\r",
+									"        });\r",
+									"    }\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{url}}/articles/{{slugArtigo}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"articles",
+								"{{slugArtigo}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get an article",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", () => {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Article contains all required fields\", () => {\r",
+									"    const article = pm.response.json().article;\r",
+									"\r",
+									"    pm.expect(article).to.have.property(\"slug\");\r",
+									"    pm.expect(article).to.have.property(\"title\");\r",
+									"    pm.expect(article).to.have.property(\"description\");\r",
+									"    pm.expect(article).to.have.property(\"body\");\r",
+									"    pm.expect(article).to.have.property(\"createdAt\");\r",
+									"    pm.expect(article).to.have.property(\"updatedAt\");\r",
+									"    pm.expect(article).to.have.property(\"tagList\");\r",
+									"    pm.expect(article.tagList).to.be.an(\"array\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"\r",
+									"const emailUsuario = `user${Math.floor(Math.random() * 100000)}@example.com`;\r",
+									"const usernameUsuario = `usuario_${Math.floor(Math.random() * 100000)}`;\r",
+									"const senhaUsuario = Math.random().toString(36).slice(-8);\r",
+									"\r",
+									"const usuario = {\r",
+									"    user: {\r",
+									"        username: usernameUsuario,\r",
+									"        email: emailUsuario,\r",
+									"        password: senhaUsuario\r",
+									"    }\r",
+									"};\r",
+									"\r",
+									"pm.sendRequest({\r",
+									"    url: \"https://conduit.mate.academy/api/users\",\r",
+									"    method: \"POST\",\r",
+									"    header: { \"Content-Type\": \"application/json\" },\r",
+									"    body: { mode: \"raw\", raw: JSON.stringify(usuario) }\r",
+									"}, function (err, res) {\r",
+									"    if (err) {\r",
+									"        console.log(\"Erro ao criar usuário:\", err);\r",
+									"    } else {\r",
+									"        const resposta = res.json();\r",
+									"        console.log(\"Usuário criado:\", resposta);\r",
+									"\r",
+									"        pm.environment.set(\"emailUsuario\", emailUsuario);\r",
+									"        pm.environment.set(\"senhaUsuario\", senhaUsuario);\r",
+									"        pm.environment.set(\"usernameUsuario\", usernameUsuario);\r",
+									"        pm.environment.set(\"authToken\", resposta.user.token);\r",
+									"\r",
+									"        const artigo = {\r",
+									"            article: {\r",
+									"                title: \"Artigo Get\",\r",
+									"                description: \"Este artigo é Get\",\r",
+									"                body: \"Conteúdo temporário.\",\r",
+									"                tagList: [\"QA\", \"Testes\"]\r",
+									"            }\r",
+									"        };\r",
+									"\r",
+									"        pm.sendRequest({\r",
+									"            url: \"https://conduit.mate.academy/api/articles\",\r",
+									"            method: \"POST\",\r",
+									"            header: {\r",
+									"                \"Content-Type\": \"application/json\",\r",
+									"                \"Authorization\": `Token ${resposta.user.token}`\r",
+									"            },\r",
+									"            body: { mode: \"raw\", raw: JSON.stringify(artigo) }\r",
+									"        }, function (err, res) {\r",
+									"            if (err) {\r",
+									"                console.log(\"Erro ao criar artigo:\", err);\r",
+									"            } else {\r",
+									"                const respostaArtigo = res.json();\r",
+									"                console.log(\"Artigo criado:\", respostaArtigo);\r",
+									"                pm.environment.set(\"slugArtigo\", respostaArtigo.article.slug);\r",
+									"            }\r",
+									"        });\r",
+									"    }\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{authToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/articles/{{slugArtigo}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"articles",
+								"{{slugArtigo}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get articles",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"  pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Articles list retrieved\", function () {\r",
+									"    const jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.have.property(\"articles\");\r",
+									"    pm.expect(jsonData.articles.length).to.be.above(0);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const emailUsuario = `user${Math.floor(Math.random() * 100000)}@example.com`;\r",
+									"const senhaUsuario = Math.random().toString(36).slice(-8);\r",
+									"const usernameUsuario = `usuario_${Math.floor(Math.random() * 100000)}`;\r",
+									"\r",
+									"const usuario = {\r",
+									"    user: {\r",
+									"        username: usernameUsuario,\r",
+									"        email: emailUsuario,\r",
+									"        password: senhaUsuario\r",
+									"    }\r",
+									"};\r",
+									"\r",
+									"pm.sendRequest({\r",
+									"    url: \"https://conduit.mate.academy/api/users\",\r",
+									"    method: \"POST\",\r",
+									"    header: { \"Content-Type\": \"application/json\" },\r",
+									"    body: { mode: \"raw\", raw: JSON.stringify(usuario) }\r",
+									"}, function (err, res) {\r",
+									"    if (!err && res.status === 201) {\r",
+									"        const respostaUsuario = res.json();\r",
+									"        pm.environment.set(\"emailUsuario\", emailUsuario);\r",
+									"        pm.environment.set(\"senhaUsuario\", senhaUsuario);\r",
+									"        pm.environment.set(\"usernameUsuario\", usernameUsuario);\r",
+									"\r",
+									"        const credenciais = {\r",
+									"            user: {\r",
+									"                email: emailUsuario,\r",
+									"                password: senhaUsuario\r",
+									"            }\r",
+									"        };\r",
+									"\r",
+									"        pm.sendRequest({\r",
+									"            url: \"https://conduit.mate.academy/api/users/login\",\r",
+									"            method: \"POST\",\r",
+									"            header: { \"Content-Type\": \"application/json\" },\r",
+									"            body: { mode: \"raw\", raw: JSON.stringify(credenciais) }\r",
+									"        }, function (err, res) {\r",
+									"            if (!err && res.status === 200) {\r",
+									"                const respostaLogin = res.json();\r",
+									"                pm.environment.set(\"authToken\", respostaLogin.user.token);\r",
+									"                console.log(\"Usuário autenticado, token salvo.\");\r",
+									"            }\r",
+									"        });\r",
+									"    }\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/articles",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"articles"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get articles from Your feed",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"  pm.response.to.have.status(200);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const emailUsuario = `user${Math.floor(Math.random() * 100000)}@example.com`;\r",
+									"const senhaUsuario = Math.random().toString(36).slice(-8);\r",
+									"const usernameUsuario = `usuario_${Math.floor(Math.random() * 100000)}`;\r",
+									"\r",
+									"const usuario = {\r",
+									"    user: {\r",
+									"        username: usernameUsuario,\r",
+									"        email: emailUsuario,\r",
+									"        password: senhaUsuario\r",
+									"    }\r",
+									"};\r",
+									"\r",
+									"pm.sendRequest({\r",
+									"    url: \"https://conduit.mate.academy/api/users\",\r",
+									"    method: \"POST\",\r",
+									"    header: { \"Content-Type\": \"application/json\" },\r",
+									"    body: { mode: \"raw\", raw: JSON.stringify(usuario) }\r",
+									"}, function (err, res) {\r",
+									"    if (!err) {\r",
+									"        const respostaUsuario = res.json();\r",
+									"        pm.environment.set(\"emailUsuario\", emailUsuario);\r",
+									"        pm.environment.set(\"senhaUsuario\", senhaUsuario);\r",
+									"        pm.environment.set(\"usernameUsuario\", usernameUsuario);\r",
+									"\r",
+									"        const credenciais = {\r",
+									"            user: {\r",
+									"                email: emailUsuario,\r",
+									"                password: senhaUsuario\r",
+									"            }\r",
+									"        };\r",
+									"\r",
+									"        pm.sendRequest({\r",
+									"            url: \"https://conduit.mate.academy/api/users/login\",\r",
+									"            method: \"POST\",\r",
+									"            header: { \"Content-Type\": \"application/json\" },\r",
+									"            body: { mode: \"raw\", raw: JSON.stringify(credenciais) }\r",
+									"        }, function (err, res) {\r",
+									"            if (!err) {\r",
+									"                const respostaLogin = res.json();\r",
+									"                pm.environment.set(\"authToken\", respostaLogin.user.token);\r",
+									"\r",
+									"                pm.sendRequest({\r",
+									"                    url: \"https://conduit.mate.academy/api/articles/feed\",\r",
+									"                    method: \"GET\",\r",
+									"                    header: {\r",
+									"                        \"Content-Type\": \"application/json\",\r",
+									"                        \"Authorization\": `Bearer ${respostaLogin.user.token}`\r",
+									"                    }\r",
+									"                }, function (err, res) {\r",
+									"                    if (!err) {\r",
+									"                        console.log(res.json());\r",
+									"                    }\r",
+									"                });\r",
+									"            }\r",
+									"        });\r",
+									"    }\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/articles/feed?limit=10&offset=0",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"articles",
+								"feed"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "offset",
+									"value": "0"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get articles from Global feed",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"  pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Global feed contains articles\", function () {\r",
+									"    const jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.articles.length).to.be.above(0);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const emailUsuario = `user${Math.floor(Math.random() * 100000)}@example.com`;\r",
+									"const senhaUsuario = Math.random().toString(36).slice(-8);\r",
+									"const usernameUsuario = `usuario_${Math.floor(Math.random() * 100000)}`;\r",
+									"\r",
+									"const usuario = {\r",
+									"    user: {\r",
+									"        username: usernameUsuario,\r",
+									"        email: emailUsuario,\r",
+									"        password: senhaUsuario\r",
+									"    }\r",
+									"};\r",
+									"\r",
+									"pm.sendRequest({\r",
+									"    url: \"https://conduit.mate.academy/api/users\",\r",
+									"    method: \"POST\",\r",
+									"    header: { \"Content-Type\": \"application/json\" },\r",
+									"    body: { mode: \"raw\", raw: JSON.stringify(usuario) }\r",
+									"}, function (err, res) {\r",
+									"    if (!err) {\r",
+									"        const respostaUsuario = res.json();\r",
+									"        pm.environment.set(\"emailUsuario\", emailUsuario);\r",
+									"        pm.environment.set(\"senhaUsuario\", senhaUsuario);\r",
+									"        pm.environment.set(\"usernameUsuario\", usernameUsuario);\r",
+									"\r",
+									"        const credenciais = {\r",
+									"            user: {\r",
+									"                email: emailUsuario,\r",
+									"                password: senhaUsuario\r",
+									"            }\r",
+									"        };\r",
+									"\r",
+									"        pm.sendRequest({\r",
+									"            url: \"https://conduit.mate.academy/api/users/login\",\r",
+									"            method: \"POST\",\r",
+									"            header: { \"Content-Type\": \"application/json\" },\r",
+									"            body: { mode: \"raw\", raw: JSON.stringify(credenciais) }\r",
+									"        }, function (err, res) {\r",
+									"            if (!err) {\r",
+									"                const respostaLogin = res.json();\r",
+									"                pm.environment.set(\"authToken\", respostaLogin.user.token);\r",
+									"\r",
+									"                pm.sendRequest({\r",
+									"                    url: \"https://conduit.mate.academy/api/articles\",\r",
+									"                    method: \"GET\",\r",
+									"                    header: {\r",
+									"                        \"Content-Type\": \"application/json\",\r",
+									"                        \"Authorization\": `Bearer ${respostaLogin.user.token}`\r",
+									"                    }\r",
+									"                }, function (err, res) {\r",
+									"                    if (!err) {\r",
+									"                        console.log(res.json());\r",
+									"                    }\r",
+									"                });\r",
+									"            }\r",
+									"        });\r",
+									"    }\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/articles?limit=10&offset=0",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"articles"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "offset",
+									"value": "0"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get articles by tag",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"  pm.response.to.have.status(200);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const emailUsuario = `user${Math.floor(Math.random() * 100000)}@example.com`;\r",
+									"const senhaUsuario = Math.random().toString(36).slice(-8);\r",
+									"const usernameUsuario = `usuario_${Math.floor(Math.random() * 100000)}`;\r",
+									"\r",
+									"const usuario = {\r",
+									"    user: {\r",
+									"        username: usernameUsuario,\r",
+									"        email: emailUsuario,\r",
+									"        password: senhaUsuario\r",
+									"    }\r",
+									"};\r",
+									"\r",
+									"pm.sendRequest({\r",
+									"    url: \"https://conduit.mate.academy/api/users\",\r",
+									"    method: \"POST\",\r",
+									"    header: { \"Content-Type\": \"application/json\" },\r",
+									"    body: { mode: \"raw\", raw: JSON.stringify(usuario) }\r",
+									"}, function (err, res) {\r",
+									"    if (!err) {\r",
+									"        const respostaUsuario = res.json();\r",
+									"        pm.environment.set(\"emailUsuario\", emailUsuario);\r",
+									"        pm.environment.set(\"senhaUsuario\", senhaUsuario);\r",
+									"        pm.environment.set(\"usernameUsuario\", usernameUsuario);\r",
+									"\r",
+									"        const credenciais = {\r",
+									"            user: {\r",
+									"                email: emailUsuario,\r",
+									"                password: senhaUsuario\r",
+									"            }\r",
+									"        };\r",
+									"\r",
+									"        pm.sendRequest({\r",
+									"            url: \"https://conduit.mate.academy/api/users/login\",\r",
+									"            method: \"POST\",\r",
+									"            header: { \"Content-Type\": \"application/json\" },\r",
+									"            body: { mode: \"raw\", raw: JSON.stringify(credenciais) }\r",
+									"        }, function (err, res) {\r",
+									"            if (!err) {\r",
+									"                const respostaLogin = res.json();\r",
+									"                pm.environment.set(\"authToken\", respostaLogin.user.token);\r",
+									"\r",
+									"                // Aqui você define a tag que quer filtrar\r",
+									"                const tagParaBuscar = \"react\";\r",
+									"\r",
+									"                pm.sendRequest({\r",
+									"                    url: `https://conduit.mate.academy/api/articles?limit=10&offset=0&tag=${tagParaBuscar}`,\r",
+									"                    method: \"GET\",\r",
+									"                    header: {\r",
+									"                        \"Content-Type\": \"application/json\",\r",
+									"                        \"Authorization\": `Bearer ${respostaLogin.user.token}`\r",
+									"                    }\r",
+									"                }, function (err, res) {\r",
+									"                    if (!err) {\r",
+									"                        console.log(\"Artigos filtrados pela tag:\", res.json());\r",
+									"                    }\r",
+									"                });\r",
+									"            }\r",
+									"        });\r",
+									"    }\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/articles?limit=10&tag=:tag:&offset=0",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"articles"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "tag",
+									"value": ":tag:"
+								},
+								{
+									"key": "offset",
+									"value": "0"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create an article without authorization",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 401\", function () {\r",
+									"  pm.response.to.have.status(401);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Unauthorized request blocked\", function () {\r",
+									"    const responseText = pm.response.text();\r",
+									"    pm.expect(responseText).to.include(\"Unauthorized\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"article\": {\r\n    \"title\": \"sem Authorization\",\r\n    \"description\": \" 0 Authorization\",\r\n    \"body\": \"sem token\",\r\n    \"tagList\": [\"teste\", \"segurity\"]\r\n  }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/articles",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"articles"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete an article without authorization",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 401 Unauthorized\", function () {\r",
+									"    pm.response.to.have.status(401);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response contém mensagem de erro Unauthorized\", function () {\r",
+									"    let jsonData;\r",
+									"    try {\r",
+									"        jsonData = pm.response.json();\r",
+									"        pm.expect(jsonData).to.have.property(\"errors\");\r",
+									"        pm.expect(jsonData.errors).to.have.property(\"body\");\r",
+									"        pm.expect(jsonData.errors.body.join(' ')).to.include(\"Unauthorized\");\r",
+									"    } catch (e) {\r",
+									"        const responseText = pm.response.text().toLowerCase();\r",
+									"        pm.expect(responseText).to.include(\"unauthorized\");\r",
+									"    }\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"\r",
+									"const emailUsuario = `user${Math.floor(Math.random() * 100000)}@example.com`;\r",
+									"const usernameUsuario = `usuario_${Math.floor(Math.random() * 100000)}`;\r",
+									"const senhaUsuario = Math.random().toString(36).slice(-8);\r",
+									"\r",
+									"const usuario = {\r",
+									"    user: {\r",
+									"        username: usernameUsuario,\r",
+									"        email: emailUsuario,\r",
+									"        password: senhaUsuario\r",
+									"    }\r",
+									"};\r",
+									"\r",
+									"pm.sendRequest({\r",
+									"    url: \"https://conduit.mate.academy/api/users\",\r",
+									"    method: \"POST\",\r",
+									"    header: { \"Content-Type\": \"application/json\" },\r",
+									"    body: { mode: \"raw\", raw: JSON.stringify(usuario) }\r",
+									"}, function (err, res) {\r",
+									"    if (err) {\r",
+									"        console.log(\"Erro ao criar usuário:\", err);\r",
+									"    } else {\r",
+									"        const resposta = res.json();\r",
+									"        console.log(\"Usuário criado:\", resposta);\r",
+									"\r",
+									"        pm.environment.set(\"emailUsuario\", emailUsuario);\r",
+									"        pm.environment.set(\"senhaUsuario\", senhaUsuario);\r",
+									"        pm.environment.set(\"usernameUsuario\", usernameUsuario);\r",
+									"        pm.environment.set(\"authToken\", resposta.user.token);\r",
+									"\r",
+									"        const artigo = {\r",
+									"            article: {\r",
+									"                title: \"Artigo para Deletar\",\r",
+									"                description: \"Este artigo será excluído nos testes\",\r",
+									"                body: \"Conteúdo temporário para testar a exclusão.\",\r",
+									"                tagList: [\"QA\", \"Testes\"]\r",
+									"            }\r",
+									"        };\r",
+									"\r",
+									"        pm.sendRequest({\r",
+									"            url: \"https://conduit.mate.academy/api/articles\",\r",
+									"            method: \"POST\",\r",
+									"            header: {\r",
+									"                \"Content-Type\": \"application/json\",\r",
+									"                \"Authorization\": `Token ${resposta.user.token}`\r",
+									"            },\r",
+									"            body: { mode: \"raw\", raw: JSON.stringify(artigo) }\r",
+									"        }, function (err, res) {\r",
+									"            if (err) {\r",
+									"                console.log(\"Erro ao criar artigo:\", err);\r",
+									"            } else {\r",
+									"                const respostaArtigo = res.json();\r",
+									"                console.log(\"Artigo criado:\", respostaArtigo);\r",
+									"                pm.environment.set(\"slugArtigo\", respostaArtigo.article.slug);\r",
+									"            }\r",
+									"        });\r",
+									"    }\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text",
+								"disabled": true
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{url}}/articles/{{slugArtigo}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"articles",
+								"{{slugArtigo}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete an article of another user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 403\", function () {\r",
+									"  pm.response.to.have.status(403);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Forbidden request blocked\", function () {\r",
+									"    const responseText = pm.response.text();\r",
+									"    pm.expect(responseText).to.include(\"Forbidden\");\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const emailUsuario1 = `user${Math.floor(Math.random() * 100000)}@example.com`;\r",
+									"const usernameUsuario1 = `usuario_${Math.floor(Math.random() * 100000)}`;\r",
+									"const senhaUsuario1 = Math.random().toString(36).slice(-8);\r",
+									"\r",
+									"const usuario1 = {\r",
+									"    user: {\r",
+									"        username: usernameUsuario1,\r",
+									"        email: emailUsuario1,\r",
+									"        password: senhaUsuario1\r",
+									"    }\r",
+									"};\r",
+									"\r",
+									"const emailUsuario2 = `user${Math.floor(Math.random() * 100000)}@example.com`;\r",
+									"const usernameUsuario2 = `usuario_${Math.floor(Math.random() * 100000)}`;\r",
+									"const senhaUsuario2 = Math.random().toString(36).slice(-8);\r",
+									"\r",
+									"const usuario2 = {\r",
+									"    user: {\r",
+									"        username: usernameUsuario2,\r",
+									"        email: emailUsuario2,\r",
+									"        password: senhaUsuario2\r",
+									"    }\r",
+									"};\r",
+									"\r",
+									"pm.sendRequest({\r",
+									"    url: \"https://conduit.mate.academy/api/users\",\r",
+									"    method: \"POST\",\r",
+									"    header: { \"Content-Type\": \"application/json\" },\r",
+									"    body: { mode: \"raw\", raw: JSON.stringify(usuario1) }\r",
+									"}, function (err, res) {\r",
+									"    if (err) {\r",
+									"        console.log(\"Erro ao criar usuário 1:\", err);\r",
+									"    } else {\r",
+									"        const resposta1 = res.json();\r",
+									"        console.log(\"Usuário 1 criado:\", resposta1);\r",
+									"\r",
+									"        pm.environment.set(\"authTokenUsuario1\", resposta1.user.token);\r",
+									"\r",
+									"        const artigo = {\r",
+									"            article: {\r",
+									"                title: \"Artigo de Outro Usuário\",\r",
+									"                description: \"Este artigo pertence ao primeiro usuário\",\r",
+									"                body: \"Teste de exclusão indevida.\",\r",
+									"                tagList: [\"QA\", \"Testes\"]\r",
+									"            }\r",
+									"        };\r",
+									"\r",
+									"        pm.sendRequest({\r",
+									"            url: \"https://conduit.mate.academy/api/articles\",\r",
+									"            method: \"POST\",\r",
+									"            header: {\r",
+									"                \"Content-Type\": \"application/json\",\r",
+									"                \"Authorization\": `Token ${resposta1.user.token}`\r",
+									"            },\r",
+									"            body: { mode: \"raw\", raw: JSON.stringify(artigo) }\r",
+									"        }, function (err, res) {\r",
+									"            if (err) {\r",
+									"                console.log(\"Erro ao criar artigo:\", err);\r",
+									"            } else {\r",
+									"                const respostaArtigo = res.json();\r",
+									"                console.log(\"Artigo criado:\", respostaArtigo);\r",
+									"                pm.environment.set(\"slugArtigo\", respostaArtigo.article.slug);\r",
+									"\r",
+									"                pm.sendRequest({\r",
+									"                    url: \"https://conduit.mate.academy/api/users\",\r",
+									"                    method: \"POST\",\r",
+									"                    header: { \"Content-Type\": \"application/json\" },\r",
+									"                    body: { mode: \"raw\", raw: JSON.stringify(usuario2) }\r",
+									"                }, function (err, res) {\r",
+									"                    if (err) {\r",
+									"                        console.log(\"Erro ao criar usuário 2:\", err);\r",
+									"                    } else {\r",
+									"                        const resposta2 = res.json();\r",
+									"                        console.log(\"Usuário 2 criado:\", resposta2);\r",
+									"                        pm.environment.set(\"authTokenUsuario2\", resposta2.user.token);\r",
+									"                    }\r",
+									"                });\r",
+									"            }\r",
+									"        });\r",
+									"    }\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Token {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/articles/{{slugArtigo}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"articles",
+								"{{slugArtigo}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete non-existing article",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 404\", function () {\r",
+									"    pm.response.to.have.status(404);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Article does not exist\", function () {\r",
+									"    const responseText = pm.response.text();\r",
+									"    pm.expect(responseText).to.include(\"Not Found\");\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const emailUsuario = `user${Math.floor(Math.random() * 100000)}@example.com`;\r",
+									"const senhaUsuario = Math.random().toString(36).slice(-8);\r",
+									"const usernameUsuario = `usuario_${Math.floor(Math.random() * 100000)}`;\r",
+									"\r",
+									"const usuario = {\r",
+									"    user: {\r",
+									"        username: usernameUsuario,\r",
+									"        email: emailUsuario,\r",
+									"        password: senhaUsuario\r",
+									"    }\r",
+									"};\r",
+									"\r",
+									"pm.sendRequest({\r",
+									"    url: \"https://conduit.mate.academy/api/users\",\r",
+									"    method: \"POST\",\r",
+									"    header: { \"Content-Type\": \"application/json\" },\r",
+									"    body: { mode: \"raw\", raw: JSON.stringify(usuario) }\r",
+									"}, function (err, res) {\r",
+									"    if (!err && res.status === 201) {\r",
+									"        const respostaUsuario = res.json();\r",
+									"        pm.environment.set(\"emailUsuario\", emailUsuario);\r",
+									"        pm.environment.set(\"senhaUsuario\", senhaUsuario);\r",
+									"        pm.environment.set(\"usernameUsuario\", usernameUsuario);\r",
+									"\r",
+									"        const credenciais = {\r",
+									"            user: {\r",
+									"                email: emailUsuario,\r",
+									"                password: senhaUsuario\r",
+									"            }\r",
+									"        };\r",
+									"\r",
+									"        pm.sendRequest({\r",
+									"            url: \"https://conduit.mate.academy/api/users/login\",\r",
+									"            method: \"POST\",\r",
+									"            header: { \"Content-Type\": \"application/json\" },\r",
+									"            body: { mode: \"raw\", raw: JSON.stringify(credenciais) }\r",
+									"        }, function (err, res) {\r",
+									"            if (!err && res.status === 200) {\r",
+									"                const respostaLogin = res.json();\r",
+									"                pm.environment.set(\"authToken\", respostaLogin.user.token);\r",
+									"            }\r",
+									"        });\r",
+									"    }\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{authToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/articles/artigo-009370-new",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"articles",
+								"artigo-009370-new"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Comments",
+			"item": [
+				{
+					"name": "Get comments",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Verificar se o comentário foi criado corretamente\", function () {\r",
+									"    const responseJson = pm.response.json();\r",
+									"\r",
+									"    pm.expect(responseJson).to.have.property(\"comments\");\r",
+									"    pm.expect(responseJson.comments).to.be.an(\"array\");\r",
+									"    pm.expect(responseJson.comments.length).to.be.greaterThan(0);\r",
+									"}); "
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const emailUsuario = `user${Math.floor(Math.random() * 100000)}@example.com`;\r",
+									"const senhaUsuario = Math.random().toString(36).slice(-8);\r",
+									"const usernameUsuario = `usuario_${Math.floor(Math.random() * 100000)}`;\r",
+									"\r",
+									"const usuario = {\r",
+									"    user: {\r",
+									"        username: usernameUsuario,\r",
+									"        email: emailUsuario,\r",
+									"        password: senhaUsuario\r",
+									"    }\r",
+									"};\r",
+									"\r",
+									"pm.sendRequest({\r",
+									"    url: \"https://conduit.mate.academy/api/users\",\r",
+									"    method: \"POST\",\r",
+									"    header: { \"Content-Type\": \"application/json\" },\r",
+									"    body: { mode: \"raw\", raw: JSON.stringify(usuario) }\r",
+									"}, function (err, res) {\r",
+									"    if (!err && res.json().user) {\r",
+									"        const respostaUsuario = res.json();\r",
+									"        pm.environment.set(\"emailUsuario\", emailUsuario);\r",
+									"        pm.environment.set(\"senhaUsuario\", senhaUsuario);\r",
+									"        pm.environment.set(\"usernameUsuario\", usernameUsuario);\r",
+									"\r",
+									"        const credenciais = {\r",
+									"            user: {\r",
+									"                email: emailUsuario,\r",
+									"                password: senhaUsuario\r",
+									"            }\r",
+									"        };\r",
+									"\r",
+									"        pm.sendRequest({\r",
+									"            url: \"https://conduit.mate.academy/api/users/login\",\r",
+									"            method: \"POST\",\r",
+									"            header: { \"Content-Type\": \"application/json\" },\r",
+									"            body: { mode: \"raw\", raw: JSON.stringify(credenciais) }\r",
+									"        }, function (err, res) {\r",
+									"            if (!err && res.json().user) {\r",
+									"                const respostaLogin = res.json();\r",
+									"                pm.environment.set(\"authToken\", respostaLogin.user.token);\r",
+									"\r",
+									"                const artigo = {\r",
+									"                    article: {\r",
+									"                        title: `Meu Artigo ${Math.floor(Math.random() * 1000)}`,\r",
+									"                        description: \"Descrição automática do artigo.\",\r",
+									"                        body: \"Este é um artigo gerado automaticamente.\",\r",
+									"                        tagList: [\"api\", \"automation\", \"postman\"]\r",
+									"                    }\r",
+									"                };\r",
+									"\r",
+									"                pm.sendRequest({\r",
+									"                    url: \"https://conduit.mate.academy/api/articles\",\r",
+									"                    method: \"POST\",\r",
+									"                    header: {\r",
+									"                        \"Content-Type\": \"application/json\",\r",
+									"                        \"Authorization\": `Bearer ${respostaLogin.user.token}`\r",
+									"                    },\r",
+									"                    body: { mode: \"raw\", raw: JSON.stringify(artigo) }\r",
+									"                }, function (err, res) {\r",
+									"                    if (!err && res.json().article) {\r",
+									"                        const respostaArtigo = res.json();\r",
+									"                        pm.environment.set(\"slugArtigo\", respostaArtigo.article.slug);\r",
+									"\r",
+									"                        const comentario = {\r",
+									"                            comment: {\r",
+									"                                body: \"Este é um comentário gerado automaticamente.\"\r",
+									"                            }\r",
+									"                        };\r",
+									"\r",
+									"                        pm.sendRequest({\r",
+									"                            url: `https://conduit.mate.academy/api/articles/${respostaArtigo.article.slug}/comments`,\r",
+									"                            method: \"POST\",\r",
+									"                            header: {\r",
+									"                                \"Content-Type\": \"application/json\",\r",
+									"                                \"Authorization\": `Bearer ${respostaLogin.user.token}`\r",
+									"                            },\r",
+									"                            body: { mode: \"raw\", raw: JSON.stringify(comentario) }\r",
+									"                        }, function (err, res) {\r",
+									"                            if (!err && res.json().comment) {\r",
+									"                                const respostaComentario = res.json();\r",
+									"                                pm.environment.set(\"idComentario\", respostaComentario.comment.id);\r",
+									"                                console.log(\"Comentário criado:\", respostaComentario);\r",
+									"                            }\r",
+									"                        });\r",
+									"                    }\r",
+									"                });\r",
+									"            }\r",
+									"        });\r",
+									"    }\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/articles/{{slugArtigo}}/comments",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"articles",
+								"{{slugArtigo}}",
+								"comments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Post a comment",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"  pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Comment posted successfully\", function () {\r",
+									"    const jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.comment).to.have.property(\"body\");\r",
+									"    pm.expect(jsonData.comment.body).to.eql(\"perfect article\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const emailUsuario = `user${Math.floor(Math.random() * 100000)}@example.com`;\r",
+									"const senhaUsuario = Math.random().toString(36).slice(-8);\r",
+									"const usernameUsuario = `usuario_${Math.floor(Math.random() * 100000)}`;\r",
+									"\r",
+									"const usuario = {\r",
+									"    user: {\r",
+									"        username: usernameUsuario,\r",
+									"        email: emailUsuario,\r",
+									"        password: senhaUsuario\r",
+									"    }\r",
+									"};\r",
+									"\r",
+									"pm.sendRequest({\r",
+									"    url: \"https://conduit.mate.academy/api/users\",\r",
+									"    method: \"POST\",\r",
+									"    header: { \"Content-Type\": \"application/json\" },\r",
+									"    body: { mode: \"raw\", raw: JSON.stringify(usuario) }\r",
+									"}, function (err, res) {\r",
+									"    if (err || !res.json().user) {\r",
+									"        console.error(\"Erro ao criar usuário:\", err || res.json());\r",
+									"        return;\r",
+									"    }\r",
+									"\r",
+									"    const respostaUsuario = res.json();\r",
+									"    pm.environment.set(\"emailUsuario\", emailUsuario);\r",
+									"    pm.environment.set(\"senhaUsuario\", senhaUsuario);\r",
+									"    pm.environment.set(\"usernameUsuario\", usernameUsuario);\r",
+									"\r",
+									"    const credenciais = {\r",
+									"        user: {\r",
+									"            email: emailUsuario,\r",
+									"            password: senhaUsuario\r",
+									"        }\r",
+									"    };\r",
+									"\r",
+									"    pm.sendRequest({\r",
+									"        url: \"https://conduit.mate.academy/api/users/login\",\r",
+									"        method: \"POST\",\r",
+									"        header: { \"Content-Type\": \"application/json\" },\r",
+									"        body: { mode: \"raw\", raw: JSON.stringify(credenciais) }\r",
+									"    }, function (err, res) {\r",
+									"        if (err || !res.json().user) {\r",
+									"            console.error(\"Erro ao fazer login:\", err || res.json());\r",
+									"            return;\r",
+									"        }\r",
+									"\r",
+									"        const respostaLogin = res.json();\r",
+									"        pm.environment.set(\"authToken\", respostaLogin.user.token);\r",
+									"\r",
+									"        const artigo = {\r",
+									"            article: {\r",
+									"                title: `Meu Artigo ${Math.floor(Math.random() * 1000)}`,\r",
+									"                description: \"Descrição automática do artigo.\",\r",
+									"                body: \"Este é um artigo gerado automaticamente.\",\r",
+									"                tagList: [\"api\", \"automation\", \"postman\"]\r",
+									"            }\r",
+									"        };\r",
+									"\r",
+									"        pm.sendRequest({\r",
+									"            url: \"https://conduit.mate.academy/api/articles\",\r",
+									"            method: \"POST\",\r",
+									"            header: {\r",
+									"                \"Content-Type\": \"application/json\",\r",
+									"                \"Authorization\": `Bearer ${respostaLogin.user.token}`\r",
+									"            },\r",
+									"            body: { mode: \"raw\", raw: JSON.stringify(artigo) }\r",
+									"        }, function (err, res) {\r",
+									"            if (err || !res.json().article) {\r",
+									"                console.error(\"Erro ao criar artigo:\", err || res.json());\r",
+									"                return;\r",
+									"            }\r",
+									"\r",
+									"            const respostaArtigo = res.json();\r",
+									"            pm.environment.set(\"slugArtigo\", respostaArtigo.article.slug);\r",
+									"        });\r",
+									"    });\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Token {{authToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"comment\": {\r\n    \"body\": \"perfect article\"\r\n  }\r\n}"
+						},
+						"url": {
+							"raw": "{{url}}/articles/{{slugArtigo}}/comments",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"articles",
+								"{{slugArtigo}}",
+								"comments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete a comment",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 204\", function () {\r",
+									"  pm.response.to.have.status(204);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const emailUsuario = `user${Math.floor(Math.random() * 100000)}@example.com`;\r",
+									"const usernameUsuario = `usuario_${Math.floor(Math.random() * 100000)}`;\r",
+									"const senhaUsuario = Math.random().toString(36).slice(-8);\r",
+									"\r",
+									"const usuario = {\r",
+									"    user: {\r",
+									"        username: usernameUsuario,\r",
+									"        email: emailUsuario,\r",
+									"        password: senhaUsuario\r",
+									"    }\r",
+									"};\r",
+									"\r",
+									"pm.sendRequest({\r",
+									"    url: \"https://conduit.mate.academy/api/users\",\r",
+									"    method: \"POST\",\r",
+									"    header: { \"Content-Type\": \"application/json\" },\r",
+									"    body: { mode: \"raw\", raw: JSON.stringify(usuario) }\r",
+									"}, function (err, res) {\r",
+									"    if (err) {\r",
+									"        console.log(\"Erro ao criar usuário:\", err);\r",
+									"    } else {\r",
+									"        const respostaUsuario = res.json();\r",
+									"        console.log(\"Usuário criado:\", respostaUsuario);\r",
+									"\r",
+									"        pm.environment.set(\"authToken\", respostaUsuario.user.token);\r",
+									"\r",
+									"        const artigo = {\r",
+									"            article: {\r",
+									"                title: \"Artigo para Teste de Exclusão\",\r",
+									"                description: \"Este artigo será usado para testar a exclusão de comentários\",\r",
+									"                body: \"Conteúdo de teste\",\r",
+									"                tagList: [\"QA\", \"Testes\"]\r",
+									"            }\r",
+									"        };\r",
+									"\r",
+									"        pm.sendRequest({\r",
+									"            url: \"https://conduit.mate.academy/api/articles\",\r",
+									"            method: \"POST\",\r",
+									"            header: {\r",
+									"                \"Content-Type\": \"application/json\",\r",
+									"                \"Authorization\": `Token ${respostaUsuario.user.token}`\r",
+									"            },\r",
+									"            body: { mode: \"raw\", raw: JSON.stringify(artigo) }\r",
+									"        }, function (err, res) {\r",
+									"            if (err) {\r",
+									"                console.log(\"Erro ao criar artigo:\", err);\r",
+									"            } else {\r",
+									"                const respostaArtigo = res.json();\r",
+									"                console.log(\"Artigo criado:\", respostaArtigo);\r",
+									"                pm.environment.set(\"slugArtigo\", respostaArtigo.article.slug);\r",
+									"\r",
+									"                const comentario = {\r",
+									"                    comment: {\r",
+									"                        body: \"Este é um comentário que será excluído.\"\r",
+									"                    }\r",
+									"                };\r",
+									"\r",
+									"                pm.sendRequest({\r",
+									"                    url: `https://conduit.mate.academy/api/articles/${respostaArtigo.article.slug}/comments`,\r",
+									"                    method: \"POST\",\r",
+									"                    header: {\r",
+									"                        \"Content-Type\": \"application/json\",\r",
+									"                        \"Authorization\": `Token ${respostaUsuario.user.token}`\r",
+									"                    },\r",
+									"                    body: { mode: \"raw\", raw: JSON.stringify(comentario) }\r",
+									"                }, function (err, res) {\r",
+									"                    if (err) {\r",
+									"                        console.log(\"Erro ao criar comentário:\", err);\r",
+									"                    } else {\r",
+									"                        const respostaComentario = res.json();\r",
+									"                        console.log(\"Comentário criado:\", respostaComentario);\r",
+									"                        pm.environment.set(\"idComentario\", respostaComentario.comment.id);\r",
+									"                    }\r",
+									"                });\r",
+									"            }\r",
+									"        });\r",
+									"    }\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{authToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://conduit.mate.academy/api/articles/{{slugArtigo}}/comments/{{idComentario}}",
+							"protocol": "https",
+							"host": [
+								"conduit",
+								"mate",
+								"academy"
+							],
+							"path": [
+								"api",
+								"articles",
+								"{{slugArtigo}}",
+								"comments",
+								"{{idComentario}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete a comment of another user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 403\", function () {\r",
+									"  pm.response.to.have.status(403);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Forbidden request blocked\", function () {\r",
+									"    const responseText = pm.response.text();\r",
+									"    pm.expect(responseText).to.include(\"Forbidden\");\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const emailUsuario1 = `user${Math.floor(Math.random() * 100000)}@example.com`;\r",
+									"const usernameUsuario1 = `usuario_${Math.floor(Math.random() * 100000)}`;\r",
+									"const senhaUsuario1 = Math.random().toString(36).slice(-8);\r",
+									"\r",
+									"const emailUsuario2 = `user${Math.floor(Math.random() * 100000)}@example.com`;\r",
+									"const usernameUsuario2 = `usuario_${Math.floor(Math.random() * 100000)}`;\r",
+									"const senhaUsuario2 = Math.random().toString(36).slice(-8);\r",
+									"\r",
+									"const usuario1 = {\r",
+									"    user: {\r",
+									"        username: usernameUsuario1,\r",
+									"        email: emailUsuario1,\r",
+									"        password: senhaUsuario1\r",
+									"    }\r",
+									"};\r",
+									"\r",
+									"const usuario2 = {\r",
+									"    user: {\r",
+									"        username: usernameUsuario2,\r",
+									"        email: emailUsuario2,\r",
+									"        password: senhaUsuario2\r",
+									"    }\r",
+									"};\r",
+									"\r",
+									"pm.sendRequest({\r",
+									"    url: \"https://conduit.mate.academy/api/users\",\r",
+									"    method: \"POST\",\r",
+									"    header: { \"Content-Type\": \"application/json\" },\r",
+									"    body: { mode: \"raw\", raw: JSON.stringify(usuario1) }\r",
+									"}, function (err, res) {\r",
+									"    if (err || !res.json().user) {\r",
+									"        console.error(\"Erro ao criar usuário 1:\", err || res.json());\r",
+									"        return;\r",
+									"    }\r",
+									"\r",
+									"    const respostaUsuario1 = res.json();\r",
+									"    console.log(\"Usuário 1 criado:\", respostaUsuario1);\r",
+									"\r",
+									"    pm.environment.set(\"authTokenUser1\", respostaUsuario1.user.token);\r",
+									"    pm.environment.set(\"usernameUser1\", usernameUsuario1);\r",
+									"\r",
+									"    pm.sendRequest({\r",
+									"        url: \"https://conduit.mate.academy/api/users\",\r",
+									"        method: \"POST\",\r",
+									"        header: { \"Content-Type\": \"application/json\" },\r",
+									"        body: { mode: \"raw\", raw: JSON.stringify(usuario2) }\r",
+									"    }, function (err, res) {\r",
+									"        if (err || !res.json().user) {\r",
+									"            console.error(\"Erro ao criar usuário 2:\", err || res.json());\r",
+									"            return;\r",
+									"        }\r",
+									"\r",
+									"        const respostaUsuario2 = res.json();\r",
+									"        console.log(\"Usuário 2 criado:\", respostaUsuario2);\r",
+									"\r",
+									"        pm.environment.set(\"authTokenUser2\", respostaUsuario2.user.token);\r",
+									"        pm.environment.set(\"usernameUser2\", usernameUsuario2);\r",
+									"\r",
+									"        const artigo = {\r",
+									"            article: {\r",
+									"                title: \"Artigo de Teste\",\r",
+									"                description: \"Teste de exclusão de comentário sem autorização\",\r",
+									"                body: \"Este é o conteúdo do artigo.\",\r",
+									"                tagList: [\"Testes\", \"API\"]\r",
+									"            }\r",
+									"        };\r",
+									"\r",
+									"        pm.sendRequest({\r",
+									"            url: \"https://conduit.mate.academy/api/articles\",\r",
+									"            method: \"POST\",\r",
+									"            header: {\r",
+									"                \"Content-Type\": \"application/json\",\r",
+									"                \"Authorization\": `Token ${respostaUsuario1.user.token}` // Usuário 1 cria o artigo\r",
+									"            },\r",
+									"            body: { mode: \"raw\", raw: JSON.stringify(artigo) }\r",
+									"        }, function (err, res) {\r",
+									"            if (err || !res.json().article) {\r",
+									"                console.error(\"Erro ao criar artigo:\", err || res.json());\r",
+									"                return;\r",
+									"            }\r",
+									"\r",
+									"            const respostaArtigo = res.json();\r",
+									"            console.log(\"Artigo criado:\", respostaArtigo);\r",
+									"            pm.environment.set(\"slugArtigo\", respostaArtigo.article.slug);\r",
+									"\r",
+									"            const comentario = {\r",
+									"                comment: {\r",
+									"                    body: \"Este é um comentário de teste.\"\r",
+									"                }\r",
+									"            };\r",
+									"\r",
+									"            pm.sendRequest({\r",
+									"                url: `https://conduit.mate.academy/api/articles/${respostaArtigo.article.slug}/comments`,\r",
+									"                method: \"POST\",\r",
+									"                header: {\r",
+									"                    \"Content-Type\": \"application/json\",\r",
+									"                    \"Authorization\": `Token ${respostaUsuario2.user.token}` // Usuário 2 cria o comentário\r",
+									"                },\r",
+									"                body: { mode: \"raw\", raw: JSON.stringify(comentario) }\r",
+									"            }, function (err, res) {\r",
+									"                if (err || !res.json().comment) {\r",
+									"                    console.error(\"Erro ao criar comentário:\", err || res.json());\r",
+									"                    return;\r",
+									"                }\r",
+									"\r",
+									"                const respostaComentario = res.json();\r",
+									"                console.log(\"Comentário criado:\", respostaComentario);\r",
+									"                pm.environment.set(\"idComentario\", respostaComentario.comment.id);\r",
+									"            });\r",
+									"        });\r",
+									"    });\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{authTokenUser1}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/articles/{{slugArtigo}}/comments/{{idComentario}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"articles",
+								"{{slugArtigo}}",
+								"comments",
+								"{{idComentario}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete a comment without authorization",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const emailUsuario = `user${Math.floor(Math.random() * 100000)}@example.com`;\r",
+									"const usernameUsuario = `usuario_${Math.floor(Math.random() * 100000)}`;\r",
+									"const senhaUsuario = Math.random().toString(36).slice(-8);\r",
+									"\r",
+									"const usuario = {\r",
+									"    user: {\r",
+									"        username: usernameUsuario,\r",
+									"        email: emailUsuario,\r",
+									"        password: senhaUsuario\r",
+									"    }\r",
+									"};\r",
+									"\r",
+									"pm.sendRequest({\r",
+									"    url: \"https://conduit.mate.academy/api/users\",\r",
+									"    method: \"POST\",\r",
+									"    header: { \"Content-Type\": \"application/json\" },\r",
+									"    body: { mode: \"raw\", raw: JSON.stringify(usuario) }\r",
+									"}, function (err, res) {\r",
+									"    if (err) {\r",
+									"        console.log(\"Erro ao criar usuário:\", err);\r",
+									"    } else {\r",
+									"        const respostaUsuario = res.json();\r",
+									"        console.log(\"Usuário criado:\", respostaUsuario);\r",
+									"\r",
+									"        pm.environment.set(\"authToken\", respostaUsuario.user.token);\r",
+									"\r",
+									"        const artigo = {\r",
+									"            article: {\r",
+									"                title: \"Artigo para Teste de Exclusão Sem Autorização\",\r",
+									"                description: \"Este artigo será usado para testar tentativa de exclusão sem autenticação\",\r",
+									"                body: \"Conteúdo de teste\",\r",
+									"                tagList: [\"QA\", \"Testes\"]\r",
+									"            }\r",
+									"        };\r",
+									"\r",
+									"        pm.sendRequest({\r",
+									"            url: \"https://conduit.mate.academy/api/articles\",\r",
+									"            method: \"POST\",\r",
+									"            header: {\r",
+									"                \"Content-Type\": \"application/json\",\r",
+									"                \"Authorization\": `Token ${respostaUsuario.user.token}`\r",
+									"            },\r",
+									"            body: { mode: \"raw\", raw: JSON.stringify(artigo) }\r",
+									"        }, function (err, res) {\r",
+									"            if (err) {\r",
+									"                console.log(\"Erro ao criar artigo:\", err);\r",
+									"            } else {\r",
+									"                const respostaArtigo = res.json();\r",
+									"                console.log(\"Artigo criado:\", respostaArtigo);\r",
+									"                pm.environment.set(\"slugArtigo\", respostaArtigo.article.slug);\r",
+									"\r",
+									"                const comentario = {\r",
+									"                    comment: {\r",
+									"                        body: \"Este é um comentário que será testado na exclusão sem autorização.\"\r",
+									"                    }\r",
+									"                };\r",
+									"\r",
+									"                pm.sendRequest({\r",
+									"                    url: `https://conduit.mate.academy/api/articles/${respostaArtigo.article.slug}/comments`,\r",
+									"                    method: \"POST\",\r",
+									"                    header: {\r",
+									"                        \"Content-Type\": \"application/json\",\r",
+									"                        \"Authorization\": `Token ${respostaUsuario.user.token}`\r",
+									"                    },\r",
+									"                    body: { mode: \"raw\", raw: JSON.stringify(comentario) }\r",
+									"                }, function (err, res) {\r",
+									"                    if (err) {\r",
+									"                        console.log(\"Erro ao criar comentário:\", err);\r",
+									"                    } else {\r",
+									"                        const respostaComentario = res.json();\r",
+									"                        console.log(\"Comentário criado:\", respostaComentario);\r",
+									"                        pm.environment.set(\"idComentario\", respostaComentario.comment.id);\r",
+									"                    }\r",
+									"                });\r",
+									"            }\r",
+									"        });\r",
+									"    }\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 401\", function () {\r",
+									"  pm.response.to.have.status(401);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/ecmascript",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/articles/{{slugArtigo}}/comments/{{idComentario}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"articles",
+								"{{slugArtigo}}",
+								"comments",
+								"{{idComentario}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Profiles",
+			"item": [
+				{
+					"name": "Get info about profile",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response has profile object\", function () {\r",
+									"    const jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.have.property(\"profile\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Profile contains required fields with valid types\", function () {\r",
+									"    const profile = pm.response.json().profile;\r",
+									"\r",
+									"    pm.expect(profile).to.have.property(\"username\").that.is.a(\"string\");\r",
+									"\r",
+									"    pm.expect(profile).to.have.property(\"bio\");\r",
+									"    pm.expect(profile.bio === null || typeof profile.bio === \"string\").to.be.true;\r",
+									"\r",
+									"    pm.expect(profile).to.have.property(\"image\");\r",
+									"    pm.expect(profile.image === null || typeof profile.image === \"string\").to.be.true;\r",
+									"\r",
+									"    pm.expect(profile).to.have.property(\"following\").that.is.a(\"boolean\");\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const emailUsuario = `user${Math.floor(Math.random() * 100000)}@example.com`;\r",
+									"const senhaUsuario = Math.random().toString(36).slice(-8);\r",
+									"const usernameUsuario = `usuario_${Math.floor(Math.random() * 100000)}`;\r",
+									"\r",
+									"const usuario = {\r",
+									"    user: {\r",
+									"        username: usernameUsuario,\r",
+									"        email: emailUsuario,\r",
+									"        password: senhaUsuario\r",
+									"    }\r",
+									"};\r",
+									"\r",
+									"pm.sendRequest({\r",
+									"    url: \"https://conduit.mate.academy/api/users\",\r",
+									"    method: \"POST\",\r",
+									"    header: { \"Content-Type\": \"application/json\" },\r",
+									"    body: { mode: \"raw\", raw: JSON.stringify(usuario) }\r",
+									"}, function (err, res) {\r",
+									"    if (!err && res.code >= 200 && res.code < 300) {\r",
+									"        const respostaUsuario = res.json();\r",
+									"        pm.environment.set(\"emailUsuario\", emailUsuario);\r",
+									"        pm.environment.set(\"senhaUsuario\", senhaUsuario);\r",
+									"        pm.environment.set(\"usernameUsuario\", usernameUsuario);\r",
+									"\r",
+									"        const credenciais = {\r",
+									"            user: {\r",
+									"                email: emailUsuario,\r",
+									"                password: senhaUsuario\r",
+									"            }\r",
+									"        };\r",
+									"\r",
+									"        pm.sendRequest({\r",
+									"            url: \"https://conduit.mate.academy/api/users/login\",\r",
+									"            method: \"POST\",\r",
+									"            header: { \"Content-Type\": \"application/json\" },\r",
+									"            body: { mode: \"raw\", raw: JSON.stringify(credenciais) }\r",
+									"        }, function (err, res) {\r",
+									"            if (!err && res.code === 200) {\r",
+									"                const respostaLogin = res.json();\r",
+									"                pm.environment.set(\"authToken\", respostaLogin.user.token);\r",
+									"\r",
+									"                pm.sendRequest({\r",
+									"                    url: \"https://conduit.mate.academy/api/articles\",\r",
+									"                    method: \"GET\",\r",
+									"                    header: { \"Content-Type\": \"application/json\" }\r",
+									"                }, function (err, res) {\r",
+									"                    if (!err && res.code === 200) {\r",
+									"                        const artigos = res.json().articles;\r",
+									"                        if (artigos.length > 0) {\r",
+									"                            const artigoEscolhido = artigos[0];\r",
+									"                            pm.environment.set(\"usuarioParaConsultar\", artigoEscolhido.author.username);\r",
+									"\r",
+									"                            console.log(\"Usuário salvo para consulta:\", artigoEscolhido.author.username);\r",
+									"                        }\r",
+									"                    }\r",
+									"                });\r",
+									"            }\r",
+									"        });\r",
+									"    }\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}profiles/{{usernameUsuario}}",
+							"host": [
+								"{{url}}profiles"
+							],
+							"path": [
+								"{{usernameUsuario}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Follow the user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"User followed successfully\", function () {\r",
+									"    const jsonData = pm.response.json();\r",
+									"    console.log(\"Follow response:\", jsonData);\r",
+									"    pm.expect(jsonData.profile.following).to.eql(true);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const emailUsuario = `user${Math.floor(Math.random() * 100000)}@example.com`;\r",
+									"const senhaUsuario = Math.random().toString(36).slice(-8);\r",
+									"const usernameUsuario = `usuario_${Math.floor(Math.random() * 100000)}`;\r",
+									"\r",
+									"const usuario = {\r",
+									"    user: {\r",
+									"        username: usernameUsuario,\r",
+									"        email: emailUsuario,\r",
+									"        password: senhaUsuario\r",
+									"    }\r",
+									"};\r",
+									"\r",
+									"pm.sendRequest({\r",
+									"    url: \"https://conduit.mate.academy/api/users\",\r",
+									"    method: \"POST\",\r",
+									"    header: { \"Content-Type\": \"application/json\" },\r",
+									"    body: { mode: \"raw\", raw: JSON.stringify(usuario) }\r",
+									"}, function (err, res) {\r",
+									"    if (!err && res.code >= 200 && res.code < 300) {\r",
+									"        const credenciais = {\r",
+									"            user: {\r",
+									"                email: emailUsuario,\r",
+									"                password: senhaUsuario\r",
+									"            }\r",
+									"        };\r",
+									"\r",
+									"        pm.sendRequest({\r",
+									"            url: \"https://conduit.mate.academy/api/users/login\",\r",
+									"            method: \"POST\",\r",
+									"            header: { \"Content-Type\": \"application/json\" },\r",
+									"            body: { mode: \"raw\", raw: JSON.stringify(credenciais) }\r",
+									"        }, function (err, res) {\r",
+									"            if (!err && res.code === 200) {\r",
+									"                const respostaLogin = res.json();\r",
+									"                const token = respostaLogin.user.token;\r",
+									"\r",
+									"                pm.environment.set(\"authToken\", token);\r",
+									"                pm.environment.set(\"emailUsuario\", emailUsuario);\r",
+									"                pm.environment.set(\"senhaUsuario\", senhaUsuario);\r",
+									"                pm.environment.set(\"usernameUsuario\", usernameUsuario);\r",
+									"\r",
+									"                pm.sendRequest({\r",
+									"                    url: \"https://conduit.mate.academy/api/articles\",\r",
+									"                    method: \"GET\",\r",
+									"                    header: { \"Content-Type\": \"application/json\" }\r",
+									"                }, function (err, res) {\r",
+									"                    if (!err && res.status === 200) {\r",
+									"                        const artigos = res.json().articles;\r",
+									"                        const autor = artigos.find(a => a.author.username !== usernameUsuario);\r",
+									"\r",
+									"                        if (autor) {\r",
+									"                            const usuarioParaSeguir = autor.author.username;\r",
+									"                            pm.environment.set(\"usuarioParaSeguir\", usuarioParaSeguir);\r",
+									"\r",
+									"                            pm.sendRequest({\r",
+									"                                url: `https://conduit.mate.academy/api/profiles/${usuarioParaSeguir}/follow`,\r",
+									"                                method: \"POST\",\r",
+									"                                header: {\r",
+									"                                    \"Content-Type\": \"application/json\",\r",
+									"                                    \"Authorization\": `Bearer ${token}`\r",
+									"                                }\r",
+									"                            }, function (err, res) {\r",
+									"                                if (!err && res.code === 200) {\r",
+									"                                    const followData = res.json();\r",
+									"                                    pm.environment.set(\"followResponse\", JSON.stringify(followData));\r",
+									"                                } else {\r",
+									"                                    console.error(\"Erro ao seguir usuário.\");\r",
+									"                                }\r",
+									"                            });\r",
+									"                        } else {\r",
+									"                            console.error(\"Nenhum autor diferente do usuário atual foi encontrado.\");\r",
+									"                        }\r",
+									"                    }\r",
+									"                });\r",
+									"            }\r",
+									"        });\r",
+									"    }\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{authToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}profiles/{{usernameUsuario}}/follow",
+							"host": [
+								"{{url}}profiles"
+							],
+							"path": [
+								"{{usernameUsuario}}",
+								"follow"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Unfollow the user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"  pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"User unfollowed successfully\", function () {\r",
+									"    const jsonData = pm.response.json();\r",
+									"    console.log(\"Resposta do unfollow:\", jsonData);\r",
+									"\r",
+									"    pm.expect(jsonData.profile.following).to.eql(false);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const emailUsuario = `user${Math.floor(Math.random() * 100000)}@example.com`;\r",
+									"const senhaUsuario = Math.random().toString(36).slice(-8);\r",
+									"const usernameUsuario = `usuario_${Math.floor(Math.random() * 100000)}`;\r",
+									"\r",
+									"const usuario = {\r",
+									"    user: {\r",
+									"        username: usernameUsuario,\r",
+									"        email: emailUsuario,\r",
+									"        password: senhaUsuario\r",
+									"    }\r",
+									"};\r",
+									"\r",
+									"pm.sendRequest({\r",
+									"    url: \"https://conduit.mate.academy/api/users\",\r",
+									"    method: \"POST\",\r",
+									"    header: { \"Content-Type\": \"application/json\" },\r",
+									"    body: { mode: \"raw\", raw: JSON.stringify(usuario) }\r",
+									"}, function (err, res) {\r",
+									"    if (!err && res.code >= 200 && res.code < 300) {\r",
+									"        const respostaUsuario = res.json();\r",
+									"        pm.environment.set(\"emailUsuario\", emailUsuario);\r",
+									"        pm.environment.set(\"senhaUsuario\", senhaUsuario);\r",
+									"        pm.environment.set(\"usernameUsuario\", usernameUsuario);\r",
+									"\r",
+									"        const credenciais = {\r",
+									"            user: {\r",
+									"                email: emailUsuario,\r",
+									"                password: senhaUsuario\r",
+									"            }\r",
+									"        };\r",
+									"\r",
+									"        pm.sendRequest({\r",
+									"            url: \"https://conduit.mate.academy/api/users/login\",\r",
+									"            method: \"POST\",\r",
+									"            header: { \"Content-Type\": \"application/json\" },\r",
+									"            body: { mode: \"raw\", raw: JSON.stringify(credenciais) }\r",
+									"        }, function (err, res) {\r",
+									"            if (!err && res.code === 200) {\r",
+									"                const respostaLogin = res.json();\r",
+									"                pm.environment.set(\"authToken\", respostaLogin.user.token);\r",
+									"\r",
+									"                pm.sendRequest({\r",
+									"                    url: \"https://conduit.mate.academy/api/articles\",\r",
+									"                    method: \"GET\",\r",
+									"                    header: { \"Content-Type\": \"application/json\" }\r",
+									"                }, function (err, res) {\r",
+									"                    if (!err && res.code === 200) {\r",
+									"                        const artigos = res.json().articles;\r",
+									"                        if (artigos.length > 0) {\r",
+									"                            const artigoEscolhido = artigos[0];\r",
+									"                            pm.environment.set(\"usuarioParaSeguir\", artigoEscolhido.author.username);\r",
+									"\r",
+									"                            console.log(\"Usuário escolhido para seguir:\", artigoEscolhido.author.username);\r",
+									"\r",
+									"                            pm.sendRequest({\r",
+									"                                url: `https://conduit.mate.academy/api/profiles/${artigoEscolhido.author.username}/follow`,\r",
+									"                                method: \"POST\",\r",
+									"                                header: {\r",
+									"                                    \"Content-Type\": \"application/json\",\r",
+									"                                    \"Authorization\": `Bearer ${respostaLogin.user.token}`\r",
+									"                                }\r",
+									"                            }, function (err, res) {\r",
+									"                                if (!err && res.code === 200) {\r",
+									"                                    console.log(\"Usuário seguido com sucesso:\", artigoEscolhido.author.username);\r",
+									"                                }\r",
+									"                            });\r",
+									"                        }\r",
+									"                    }\r",
+									"                });\r",
+									"            }\r",
+									"        });\r",
+									"    }\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{authToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/profiles/{{usernameUsuario}}/follow",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"profiles",
+								"{{usernameUsuario}}",
+								"follow"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Tags",
+			"item": [
+				{
+					"name": "Get tags",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"  pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Verificar se a resposta contém tags\", function () {\r",
+									"    const responseJson = pm.response.json();\r",
+									"    \r",
+									"    pm.expect(responseJson).to.have.property(\"tags\");\r",
+									"    pm.expect(responseJson.tags).to.be.an(\"array\");\r",
+									"    pm.expect(responseJson.tags.length).to.be.greaterThan(0);\r",
+									"    \r",
+									"    console.log(\"Tags recuperadas:\", responseJson.tags);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/tags",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"tags"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "url",
+			"value": "https://conduit.mate.academy/api/",
+			"type": "string"
+		},
+		{
+			"key": "email",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "passwordConduit",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
