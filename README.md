@@ -1,4 +1,4 @@
-#🧪 Testes Automatizados de API com Postman
+# 🧪 Testes Automatizados de API com Postman
 
 Projeto de automação de testes de API com foco na validação de endpoints REST, status codes e cenários com dados válidos e inválidos.
 
@@ -53,7 +53,7 @@ Garantir a qualidade e confiabilidade da API através de testes automatizados, v
 
 ---
 
-##▶️ Como executar o projeto
+## ▶️ Como executar o projeto
 
 1. Importar a collection no Postman
 2. Configurar o environment (se necessário)
@@ -61,7 +61,7 @@ Garantir a qualidade e confiabilidade da API através de testes automatizados, v
 
 ---
 
-##👨‍💻 Autor
+## 👨‍💻 Autor
 
 Gláuber Malta
 QA Júnior em formação, com foco em testes de API e automação
